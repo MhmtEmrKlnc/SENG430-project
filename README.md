@@ -6,6 +6,7 @@ The ML Visualization Tool helps doctors, nurses, and other healthcare profession
 The following repository structure represents the planned organization of the project.  
 Since the implementation phase has not yet started (Sprint 1), some directories are placeholders and may evolve as development progresses.
 
+```
 ml-visualization-tool
 │
 ├── README.md
@@ -60,3 +61,4 @@ ml-visualization-tool
 ├── tests/                    # Unit and integration tests
 │
 └── scripts/                  # Utility scripts (data loading, preprocessing etc.)
+```
