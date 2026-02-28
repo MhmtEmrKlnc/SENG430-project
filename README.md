@@ -62,3 +62,14 @@ ml-visualization-tool
 │
 └── scripts/                  # Utility scripts (data loading, preprocessing etc.)
 ```
+
+## Branch Protection Rules
+
+Branch protection rules have been configured for the `main` branch to ensure a safe development workflow.
+
+Rules applied:
+
+- Direct pushes to `main` are restricted
+- Changes must be submitted through Pull Requests
+- At least one approval is required before merging
+- All conversations must be resolved before merging
