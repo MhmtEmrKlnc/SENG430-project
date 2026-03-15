@@ -1,24 +1,37 @@
-import React from 'react';
-import { X, AlertTriangle, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, AlertTriangle, Info, Loader2 } from 'lucide-react';
+import api from '../api';
 
-export default function ColumnMapperModal({ onClose, onSave }) {
-  const previewData = [
-    { col: 'Age', val: '62' },
-    { col: 'Ejection_Fraction', val: '38' },
-    { col: 'Serum_Creatinine', val: '1.3' },
-    { col: 'Smoker', val: 'Yes' },
-    { col: 'patient_id', val: 'PX-88412' },
-    { col: 'Readmitted_30d', val: '1' },
-  ];
+export default function ColumnMapperModal({ summary, onClose, onSave }) {
+  const defaultTarget = summary?.target_column || (summary?.columns.length > 0 ? summary.columns[0].name : '');
+  const [targetColumn, setTargetColumn] = useState(defaultTarget);
+  const [saving, setSaving] = useState(false);
 
-  const columnRoles = [
-    { name: 'Readmitted_30d', auto: 'Binary (0/1)', role: 'Target (what to predict)', color: 'success' },
-    { name: 'Age', auto: 'Number', role: 'Number (measurement)', color: 'success' },
-    { name: 'Ejection_Fraction', auto: 'Number', role: 'Number (measurement)', color: 'success' },
-    { name: 'Serum_Creatinine', auto: 'Number — 6.8% missing', role: 'Number (measurement)', color: 'warning' },
-    { name: 'Smoker', auto: 'Category', role: 'Category', color: 'success' },
-    { name: 'patient_id', auto: 'Identifier-like', role: 'Ignore (not a measurement)', color: 'danger' },
-  ];
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      await api.post('/projects/1/column-mapper/save/', {
+        target_column: targetColumn
+      });
+      onSave(targetColumn);
+    } catch (err) {
+      console.error("Error saving column mapper:", err);
+      alert(err.response?.data?.banner?.message || "Failed to save column mapping.");
+      setSaving(false);
+    }
+  };
+  // Determine the display columns to show
+  // If we have real summary data, use that. Otherwise fallback to empty arrays to prevent crashes.
+  const previewData = summary?.preview_data || [];
+  
+  const columnRoles = summary?.columns?.map(col => ({
+    name: col.name,
+    auto: col.type === 'numeric' 
+          ? (col.missing_percentage > 0 ? `Number — ${col.missing_percentage}% missing` : 'Number') 
+          : 'Category',
+    role: col.name === defaultTarget ? 'Target (what to predict)' : (col.type === 'numeric' ? 'Number (measurement)' : 'Category'),
+    color: col.missing_percentage > 20 ? 'danger' : (col.missing_percentage > 0 ? 'warning' : 'success')
+  })) || [];
 
   return (
     <div className="modal-overlay">
@@ -47,8 +60,14 @@ export default function ColumnMapperModal({ onClose, onSave }) {
             
             <div className="form-group">
               <label className="form-label">Target Column (What We Are Predicting)</label>
-              <select className="form-select">
-                <option>Readmitted_30d</option>
+              <select 
+                className="form-select"
+                value={targetColumn}
+                onChange={e => setTargetColumn(e.target.value)}
+              >
+                {summary?.columns?.map(c => (
+                  <option key={c.name} value={c.name}>{c.name}</option>
+                ))}
               </select>
             </div>
 
@@ -64,13 +83,20 @@ export default function ColumnMapperModal({ onClose, onSave }) {
             <div className="alert alert-warning" style={{fontSize: '0.75rem', padding: '0.75rem'}}>
               <AlertTriangle className="alert-icon" size={14} />
               <div>
-                <strong>Warning:</strong> patient_id appears to be an identifier (random text/number). Set its role to 'Ignore' — it is not a clinical measurement and would mislead the model.
+                <strong>Warning:</strong> Ensure identifier columns like patient IDs are set to 'Ignore' — they are not clinical measurements and would mislead the model.
               </div>
             </div>
             
             <div style={{display: 'flex', gap: '0.5rem', marginBottom: '2rem'}}>
               <button className="btn-secondary" style={{flex: 1, justifyContent: 'center'}}>Validate Schema</button>
-              <button className="btn-primary" style={{flex: 1, justifyContent: 'center'}} onClick={onSave}>Save Mapping</button>
+              <button 
+                className="btn-primary" 
+                style={{flex: 1, justifyContent: 'center'}} 
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? <Loader2 className="animate-spin" size={16} /> : 'Save Mapping'}
+              </button>
             </div>
             
             <h4 className="sidebar-title">Data Preview (First 5 Rows)</h4>
@@ -82,11 +108,13 @@ export default function ColumnMapperModal({ onClose, onSave }) {
                  </tr>
                </thead>
                <tbody>
-                 {previewData.map((row, i) => (
-                   <tr key={i}>
-                     <td style={{fontSize: '0.875rem'}}>{row.col}</td>
-                     <td style={{fontSize: '0.875rem', color: '#475569'}}>{row.val}</td>
-                   </tr>
+                 {previewData.slice(0, 5).map((row, i) => (
+                   Object.keys(row).map((colName, j) => (
+                     <tr key={`${i}-${j}`}>
+                       <td style={{fontSize: '0.875rem'}}>{colName}</td>
+                       <td style={{fontSize: '0.875rem', color: '#475569'}}>{String(row[colName])}</td>
+                     </tr>
+                   ))
                  ))}
                </tbody>
             </table>
@@ -136,8 +164,15 @@ export default function ColumnMapperModal({ onClose, onSave }) {
         <div className="modal-footer">
           <span style={{fontSize: '0.875rem', color: '#64748B'}}>Save the mapping to unlock Step 3.</span>
           <div style={{display: 'flex', gap: '0.5rem'}}>
-            <button className="btn-secondary" onClick={onClose}>Cancel</button>
-            <button className="btn-primary" style={{backgroundColor: '#059669'}} onClick={onSave}>Save & Close</button>
+            <button className="btn-secondary" onClick={onClose} disabled={saving}>Cancel</button>
+            <button 
+              className="btn-primary" 
+              style={{backgroundColor: '#059669'}} 
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? 'Saving...' : 'Save & Close'}
+            </button>
           </div>
         </div>
       </div>

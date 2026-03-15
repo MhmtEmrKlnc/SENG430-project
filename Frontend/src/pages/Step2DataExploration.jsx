@@ -1,21 +1,67 @@
-import React, { useState } from 'react';
-import { AlertTriangle, Database, Lock, CheckCircle2, ChevronRight, LayoutGrid } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { AlertTriangle, Database, Lock, CheckCircle2, ChevronRight, LayoutGrid, Loader2 } from 'lucide-react';
 import StepHeader from '../components/StepHeader';
 import ColumnMapperModal from '../components/ColumnMapperModal';
-
-const measurements = [
-  { name: 'Ejection Fraction (%)', type: 'Number', missing: '0%', action: 'Ready', status: 'success' },
-  { name: 'Serum Creatinine', type: 'Number', missing: '6.8%', action: 'Fill Missing Values', status: 'warning' },
-  { name: 'Age (years)', type: 'Number', missing: '0%', action: 'Ready', status: 'success' },
-  { name: 'Sex', type: 'Category', missing: '0%', action: 'Ready', status: 'success' },
-  { name: 'Smoking Status', type: 'Category', missing: '0.3%', action: 'Ready', status: 'success' },
-  { name: 'Patient ID', type: 'Identifier', missing: '0%', action: 'Exclude - Not a clinical measurement', status: 'danger' },
-];
+import api from '../api';
 
 export default function Step2DataExploration({ onNext, onPrevious }) {
   const [dataSource, setDataSource] = useState('default');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMapped, setIsMapped] = useState(false);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Fetch summary for project with ID 1
+    api.get('/projects/1/step2/summary/')
+      .then(res => {
+        setSummary(res.data);
+        setIsMapped(res.data.schema_ok);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching summary:', err);
+        setError('Failed to load dataset summary. Make sure the backend is running.');
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="step-container" style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px'}}>
+        <Loader2 className="animate-spin" size={32} style={{color: 'var(--color-primary)'}} />
+        <span style={{marginLeft: '1rem'}}>Loading dataset summary...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="step-container">
+        <div className="alert alert-danger">
+          <AlertTriangle className="alert-icon" size={24} />
+          <div>{error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate missing percentage
+  const totalCells = summary.row_count * summary.column_count;
+  const missingPercentage = totalCells > 0 ? ((summary.missing_cells / totalCells) * 100).toFixed(1) : 0;
+
+  // Process class distribution if available
+  let totalClasses = 0;
+  let classes = [];
+  if (summary.class_distribution && Object.keys(summary.class_distribution).length > 0) {
+    totalClasses = Object.values(summary.class_distribution).reduce((a, b) => a + b, 0);
+    classes = Object.entries(summary.class_distribution).map(([name, count]) => ({
+      name,
+      count,
+      percentage: totalClasses > 0 ? Math.round((count / totalClasses) * 100) : 0
+    }));
+  }
 
   return (
     <div className="step-container">
@@ -62,7 +108,11 @@ export default function Step2DataExploration({ onNext, onPrevious }) {
             <div className="form-group">
               <label className="form-label">Target Column (What We Want to Predict)</label>
               <select className="form-select">
-                <option>Readmitted within 30 days (Yes / No)</option>
+                {summary.target_column ? (
+                  <option>{summary.target_column}</option>
+                ) : (
+                  <option>Not selected</option>
+                )}
               </select>
               <p style={{fontSize: '0.75rem', marginTop: '0.5rem', marginBottom: '1rem'}}>This is the outcome the model will learn to predict.</p>
             </div>
@@ -93,15 +143,17 @@ export default function Step2DataExploration({ onNext, onPrevious }) {
             <h3 className="sidebar-title">Dataset Summary</h3>
             <div className="stat-cards">
               <div className="stat-card">
-                <div className="stat-value">304</div>
+                <div className="stat-value">{summary.row_count}</div>
                 <div className="stat-label">Patients</div>
               </div>
               <div className="stat-card">
-                <div className="stat-value">12</div>
+                <div className="stat-value">{summary.column_count}</div>
                 <div className="stat-label">Measurements</div>
               </div>
               <div className="stat-card">
-                <div className="stat-value" style={{color: '#D97706'}}>6.8%</div>
+                <div className="stat-value" style={{color: missingPercentage > 5 ? '#D97706' : 'inherit'}}>
+                  {missingPercentage}%
+                </div>
                 <div className="stat-label">Missing Data</div>
               </div>
             </div>
@@ -113,32 +165,32 @@ export default function Step2DataExploration({ onNext, onPrevious }) {
           <div className="output-table-container">
             <h3 className="sidebar-title">Class Balance — How many readmitted vs. not?</h3>
             
-            <div className="progress-bar-container">
-              <div className="progress-header">
-                <span>Not Readmitted (0)</span>
-                <strong>67%</strong>
+            {classes.length > 0 ? (
+              classes.map((cls, idx) => (
+                <div className="progress-bar-container" key={idx}>
+                  <div className="progress-header">
+                    <span>Class: {cls.name} ({cls.count})</span>
+                    <strong>{cls.percentage}%</strong>
+                  </div>
+                  <div className="progress-track">
+                    <div className={`progress-fill ${idx === 1 ? 'alt' : ''}`} style={{width: `${cls.percentage}%`}}></div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{color: '#64748B', fontSize: '0.875rem', padding: '1rem', backgroundColor: '#F8FAFC', borderRadius: '6px'}}>
+                Select a target column to view class balance.
               </div>
-              <div className="progress-track">
-                <div className="progress-fill" style={{width: '67%'}}></div>
-              </div>
-            </div>
+            )}
             
-            <div className="progress-bar-container">
-              <div className="progress-header">
-                <span>Readmitted (1)</span>
-                <strong>33%</strong>
+            {summary.imbalance_warning && (
+              <div className="alert alert-warning" style={{marginTop: '1.5rem'}}>
+                <AlertTriangle className="alert-icon" size={16} />
+                <div>
+                  <strong>Imbalance detected:</strong> One class is significantly larger than the other. This can cause the model to be biased. We will handle this in Step 3.
+                </div>
               </div>
-              <div className="progress-track">
-                <div className="progress-fill alt" style={{width: '33%'}}></div>
-              </div>
-            </div>
-            
-            <div className="alert alert-warning" style={{marginTop: '1.5rem'}}>
-              <AlertTriangle className="alert-icon" size={16} />
-              <div>
-                <strong>Imbalance detected:</strong> Only 33% of patients were readmitted. A lazy model could predict 'not readmitted' for everyone and be 67% accurate — but miss all real cases. We will handle this in Step 3.
-              </div>
-            </div>
+            )}
             
             <h3 className="sidebar-title" style={{marginTop: '2.5rem'}}>Patient Measurements (Features)</h3>
             <table className="output-table">
@@ -151,18 +203,26 @@ export default function Step2DataExploration({ onNext, onPrevious }) {
                 </tr>
               </thead>
               <tbody>
-                {measurements.map((row, i) => (
-                  <tr key={i}>
-                    <td style={{fontWeight: 500}}>{row.name}</td>
-                    <td style={{color: '#475569'}}>{row.type}</td>
-                    <td style={{color: '#475569'}}>{row.missing}</td>
-                    <td>
-                      <span className={`badge badge-${row.status}`}>
-                        {row.action}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {summary.columns.map((col, i) => {
+                  const missingColPerc = ((col.missing / summary.row_count) * 100).toFixed(1);
+                  let status = 'success';
+                  let action = 'Ready';
+                  if (col.missing > 0) { status = 'warning'; action = 'Fill Missing Values'; }
+                  if (col.name === 'patient_id' || col.name.toLowerCase().includes('id')) { status = 'danger'; action = 'Exclude'; }
+
+                  return (
+                    <tr key={i}>
+                      <td style={{fontWeight: 500}}>{col.name}</td>
+                      <td style={{color: '#475569'}}>{col.type}</td>
+                      <td style={{color: '#475569'}}>{missingColPerc}%</td>
+                      <td>
+                        <span className={`badge badge-${status}`}>
+                          {action}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -180,8 +240,15 @@ export default function Step2DataExploration({ onNext, onPrevious }) {
       
       {isModalOpen && (
         <ColumnMapperModal 
+          summary={summary}
           onClose={() => setIsModalOpen(false)} 
-          onSave={() => { setIsMapped(true); setIsModalOpen(false); }} 
+          onSave={(targetColumn) => { 
+            // In a real app we would refresh summary state here from backend after save
+            setIsMapped(true); 
+            setIsModalOpen(false); 
+            // Optimistic update of UI
+            setSummary(prev => ({...prev, target_column: targetColumn, schema_ok: true}));
+          }} 
         />
       )}
     </div>
