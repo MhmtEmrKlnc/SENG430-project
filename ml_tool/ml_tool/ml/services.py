@@ -261,13 +261,15 @@ def apply_step3_preparation(project, missing_strategy, normalization_method, tra
             raise ValueError("SMOTE requires at least 2 target classes in training data.")
 
         min_class_count = y_train.value_counts(dropna=True).min()
-        k_neighbors = min(5, min_class_count - 1)
         
-        if k_neighbors < 1:
-            raise ValueError("Not enough samples in the minority class to apply SMOTE correctly.")
+        if min_class_count <= 1:
+            from imblearn.over_sampling import RandomOverSampler
+            sampler = RandomOverSampler(random_state=42)
+        else:
+            k_neighbors = min(5, min_class_count - 1)
+            sampler = SMOTE(sampling_strategy='auto', k_neighbors=k_neighbors, random_state=42)
             
-        smote = SMOTE(sampling_strategy='auto', k_neighbors=k_neighbors, random_state=42)
-        X_resampled, y_resampled = smote.fit_resample(X_train_norm, y_train)
+        X_resampled, y_resampled = sampler.fit_resample(X_train_norm, y_train)
         y_train_after = pd.Series(y_resampled)
         class_balance_after = class_balance_to_chart(y_train_after)
 
