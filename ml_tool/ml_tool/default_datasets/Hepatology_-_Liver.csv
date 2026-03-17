@@ -1,0 +1,584 @@
+age,measurement_1,measurement_2,categorical_feature,Dataset
+69,70.59,138.55,A,Liver Disease
+32,39.83,143.5,C,Liver Disease
+89,,141.15,A,Liver Disease
+78,44.37,111.92,A,Liver Disease
+38,39.59,121.19,B,Liver Disease
+41,51.65,83.19,B,No Liver Disease
+20,55.14,117.76,B,No Liver Disease
+39,78.67,149.59,B,Liver Disease
+70,54.79,103.48,C,Liver Disease
+19,52.9,145.58,C,Liver Disease
+47,73.94,122.29,C,Liver Disease
+55,59.02,85.37,B,Liver Disease
+19,40.34,92.32,B,No Liver Disease
+81,70.34,142.98,B,Liver Disease
+77,38.91,133.81,C,Liver Disease
+38,40.26,122.54,B,No Liver Disease
+50,37.27,113.15,A,Liver Disease
+75,35.96,125.26,A,No Liver Disease
+39,55.0,142.01,B,Liver Disease
+66,46.13,156.9,A,Liver Disease
+76,-2.17,158.09,A,Liver Disease
+59,45.98,129.3,C,Liver Disease
+77,42.23,115.7,B,No Liver Disease
+32,63.39,123.66,B,Liver Disease
+79,41.55,133.05,C,No Liver Disease
+79,88.09,132.95,A,Liver Disease
+64,70.95,152.7,A,Liver Disease
+79,44.15,172.89,B,Liver Disease
+68,67.24,114.87,A,Liver Disease
+72,57.88,173.9,C,No Liver Disease
+81,53.5,149.31,C,Liver Disease
+20,62.04,117.48,B,Liver Disease
+68,50.81,157.46,C,Liver Disease
+24,53.61,162.14,C,Liver Disease
+38,62.35,108.49,B,Liver Disease
+56,80.79,163.31,C,Liver Disease
+35,53.77,146.88,C,No Liver Disease
+21,43.19,179.21,C,Liver Disease
+77,,109.4,A,Liver Disease
+31,79.42,111.16,B,Liver Disease
+26,46.05,69.33,B,Liver Disease
+70,58.02,134.28,B,No Liver Disease
+19,78.59,129.38,A,Liver Disease
+77,53.41,105.93,A,Liver Disease
+88,47.08,117.95,B,Liver Disease
+61,71.3,87.22,A,Liver Disease
+25,56.91,149.96,B,Liver Disease
+64,58.79,107.76,A,No Liver Disease
+52,27.15,197.35,C,No Liver Disease
+53,68.09,115.61,C,No Liver Disease
+67,55.63,101.01,B,Liver Disease
+21,29.43,109.69,A,Liver Disease
+19,57.28,84.7,A,Liver Disease
+23,19.06,132.06,C,Liver Disease
+71,85.13,109.5,C,No Liver Disease
+21,33.47,148.28,A,Liver Disease
+71,74.18,113.13,A,No Liver Disease
+80,37.81,154.61,A,No Liver Disease
+35,58.4,138.94,A,Liver Disease
+61,36.32,120.71,A,Liver Disease
+51,64.96,159.51,A,Liver Disease
+79,46.47,143.81,B,Liver Disease
+31,57.02,193.66,A,No Liver Disease
+65,50.23,109.76,C,Liver Disease
+32,29.52,121.92,B,Liver Disease
+89,,159.22,A,Liver Disease
+79,42.45,81.41,C,No Liver Disease
+57,65.68,152.92,B,Liver Disease
+70,46.46,130.98,C,No Liver Disease
+41,48.85,97.79,A,Liver Disease
+43,75.24,85.92,A,No Liver Disease
+77,85.72,103.19,A,No Liver Disease
+58,61.79,62.88,A,Liver Disease
+46,45.69,107.76,B,Liver Disease
+32,44.38,135.56,B,No Liver Disease
+62,37.72,108.09,C,Liver Disease
+82,40.62,154.71,A,No Liver Disease
+88,45.9,161.5,C,Liver Disease
+26,79.46,151.89,B,No Liver Disease
+18,47.04,125.77,A,No Liver Disease
+25,31.61,61.88,A,No Liver Disease
+80,50.62,102.41,B,Liver Disease
+28,52.67,116.45,B,Liver Disease
+25,50.53,97.65,B,Liver Disease
+52,62.0,116.51,B,Liver Disease
+52,51.04,160.25,B,Liver Disease
+50,61.53,78.86,A,Liver Disease
+22,38.29,165.29,B,No Liver Disease
+58,76.71,142.12,A,Liver Disease
+45,53.79,126.71,A,Liver Disease
+24,56.0,102.16,B,Liver Disease
+89,38.23,98.15,B,Liver Disease
+29,57.08,79.34,A,Liver Disease
+51,59.77,162.92,B,No Liver Disease
+50,32.45,158.44,B,No Liver Disease
+65,25.11,84.84,B,Liver Disease
+40,54.4,106.18,C,Liver Disease
+79,42.67,130.83,A,No Liver Disease
+54,53.9,112.51,C,Liver Disease
+61,30.63,72.03,B,Liver Disease
+52,26.59,103.56,C,Liver Disease
+82,53.1,168.78,B,Liver Disease
+64,,105.25,C,Liver Disease
+20,18.34,115.91,B,Liver Disease
+18,70.15,91.37,C,Liver Disease
+22,30.39,134.69,C,No Liver Disease
+31,88.6,122.88,C,Liver Disease
+44,40.64,101.45,A,No Liver Disease
+26,56.02,87.38,C,No Liver Disease
+32,,155.11,A,Liver Disease
+59,72.19,79.86,B,Liver Disease
+68,79.79,132.6,C,Liver Disease
+80,27.15,66.15,B,Liver Disease
+69,32.96,137.68,B,No Liver Disease
+21,53.39,144.26,C,Liver Disease
+40,62.6,147.37,A,No Liver Disease
+32,49.83,115.97,C,Liver Disease
+60,25.43,159.6,B,Liver Disease
+46,57.45,177.69,B,Liver Disease
+53,47.09,111.96,C,Liver Disease
+30,46.91,108.72,A,Liver Disease
+49,15.83,123.73,A,Liver Disease
+88,61.96,108.06,B,Liver Disease
+76,52.18,104.4,B,Liver Disease
+45,76.93,106.58,A,No Liver Disease
+83,48.88,162.89,C,Liver Disease
+59,58.5,139.3,B,No Liver Disease
+62,62.48,107.98,A,No Liver Disease
+79,23.81,58.62,B,No Liver Disease
+74,89.25,81.39,C,Liver Disease
+23,43.54,132.59,A,No Liver Disease
+45,57.42,66.96,B,Liver Disease
+45,59.61,127.32,C,Liver Disease
+61,37.78,93.36,B,Liver Disease
+47,77.7,122.3,C,No Liver Disease
+79,53.99,121.6,C,Liver Disease
+79,46.8,123.01,A,No Liver Disease
+18,52.08,110.14,C,Liver Disease
+44,61.46,109.32,B,No Liver Disease
+79,50.16,101.98,C,No Liver Disease
+20,63.23,132.1,C,Liver Disease
+87,24.73,140.13,A,No Liver Disease
+89,38.78,89.53,C,Liver Disease
+44,17.92,118.71,C,Liver Disease
+26,79.96,124.91,B,Liver Disease
+79,,124.59,A,Liver Disease
+54,59.4,124.17,A,Liver Disease
+68,,109.95,A,Liver Disease
+61,85.85,126.98,C,Liver Disease
+41,40.93,135.45,A,No Liver Disease
+76,46.8,123.53,C,No Liver Disease
+49,52.39,132.65,C,No Liver Disease
+69,56.77,144.76,B,No Liver Disease
+79,59.66,73.73,B,No Liver Disease
+75,60.26,143.59,B,Liver Disease
+69,47.83,128.56,B,Liver Disease
+29,60.02,92.21,B,No Liver Disease
+56,47.16,140.06,C,Liver Disease
+19,58.69,110.04,C,Liver Disease
+20,57.46,113.45,A,Liver Disease
+73,61.44,107.31,C,Liver Disease
+76,59.57,127.56,C,Liver Disease
+19,43.36,100.37,B,Liver Disease
+19,56.88,142.54,C,Liver Disease
+71,59.8,116.53,B,Liver Disease
+18,30.63,110.89,A,Liver Disease
+36,45.89,138.82,A,Liver Disease
+19,59.12,112.01,C,No Liver Disease
+70,75.64,143.7,A,Liver Disease
+61,62.37,144.49,C,Liver Disease
+49,76.59,86.63,A,No Liver Disease
+87,44.02,147.73,B,Liver Disease
+49,53.75,83.45,B,Liver Disease
+85,62.09,149.29,B,Liver Disease
+72,15.1,170.71,B,No Liver Disease
+73,,141.87,C,Liver Disease
+34,22.09,66.08,A,Liver Disease
+55,64.95,146.59,C,No Liver Disease
+41,60.3,176.15,B,Liver Disease
+86,14.91,112.42,C,Liver Disease
+87,15.66,119.13,A,Liver Disease
+28,71.49,90.29,C,Liver Disease
+33,68.22,127.8,A,Liver Disease
+76,36.79,151.73,C,Liver Disease
+87,36.77,137.44,A,No Liver Disease
+20,57.69,198.55,A,Liver Disease
+37,49.81,120.83,B,Liver Disease
+76,65.82,79.23,A,Liver Disease
+53,57.19,124.27,B,Liver Disease
+36,73.75,59.59,B,Liver Disease
+84,64.55,106.67,B,No Liver Disease
+36,60.81,160.61,C,Liver Disease
+37,44.72,128.13,C,No Liver Disease
+88,,124.49,C,No Liver Disease
+69,49.22,165.52,C,Liver Disease
+50,77.61,113.24,A,No Liver Disease
+57,43.91,151.55,A,Liver Disease
+56,,123.23,C,Liver Disease
+18,16.33,129.5,A,Liver Disease
+28,60.14,89.57,A,Liver Disease
+74,83.86,107.95,B,Liver Disease
+67,36.0,85.06,B,Liver Disease
+40,97.62,117.62,B,Liver Disease
+48,52.73,129.76,B,Liver Disease
+59,11.41,92.25,A,Liver Disease
+24,44.22,171.23,C,No Liver Disease
+33,69.96,126.95,A,No Liver Disease
+77,79.99,121.44,A,Liver Disease
+19,60.77,139.24,A,Liver Disease
+18,,99.28,B,No Liver Disease
+65,32.33,124.09,B,No Liver Disease
+29,39.8,102.08,B,No Liver Disease
+86,24.81,158.97,C,Liver Disease
+54,40.92,93.53,A,Liver Disease
+49,61.43,121.58,C,Liver Disease
+26,53.19,128.23,B,Liver Disease
+36,63.02,129.87,C,No Liver Disease
+65,35.95,105.47,A,No Liver Disease
+20,36.87,97.61,A,Liver Disease
+37,53.07,105.83,B,No Liver Disease
+41,40.96,133.21,B,Liver Disease
+71,69.53,116.4,C,Liver Disease
+50,40.59,139.91,B,Liver Disease
+41,42.57,131.93,B,No Liver Disease
+89,56.28,63.08,A,Liver Disease
+53,44.16,126.19,B,No Liver Disease
+55,31.48,176.26,B,No Liver Disease
+42,33.51,153.13,A,Liver Disease
+35,58.07,130.55,A,Liver Disease
+83,29.62,93.52,C,No Liver Disease
+71,70.96,131.94,B,Liver Disease
+52,39.64,138.49,A,No Liver Disease
+78,59.24,113.66,C,No Liver Disease
+58,40.54,127.92,C,Liver Disease
+50,36.27,157.74,B,Liver Disease
+85,53.69,98.57,B,No Liver Disease
+50,,93.54,C,Liver Disease
+31,46.29,137.32,A,Liver Disease
+38,49.02,131.44,C,Liver Disease
+65,62.11,145.72,B,Liver Disease
+37,62.61,134.24,A,No Liver Disease
+25,49.42,105.81,A,No Liver Disease
+24,43.35,130.8,C,Liver Disease
+84,51.24,91.45,B,Liver Disease
+34,47.14,113.74,C,Liver Disease
+50,54.69,132.57,C,No Liver Disease
+65,32.09,110.99,C,Liver Disease
+76,54.16,181.7,A,Liver Disease
+39,39.23,72.7,A,Liver Disease
+47,63.59,106.31,B,Liver Disease
+55,39.91,96.56,B,No Liver Disease
+68,40.17,102.49,C,Liver Disease
+71,56.68,103.93,C,Liver Disease
+25,50.21,86.84,C,Liver Disease
+44,84.15,138.82,B,No Liver Disease
+44,25.56,106.32,A,Liver Disease
+38,51.65,124.09,A,Liver Disease
+47,66.94,109.13,C,Liver Disease
+45,41.33,102.73,C,No Liver Disease
+81,36.34,161.81,C,Liver Disease
+86,36.94,143.07,C,Liver Disease
+78,25.82,73.29,B,Liver Disease
+65,70.25,70.65,A,No Liver Disease
+36,45.06,146.07,C,Liver Disease
+21,43.28,107.0,B,No Liver Disease
+52,18.14,78.77,C,Liver Disease
+81,28.49,146.14,C,Liver Disease
+66,71.98,124.23,A,Liver Disease
+34,54.55,126.29,C,No Liver Disease
+61,67.5,140.24,A,Liver Disease
+47,65.6,87.25,A,No Liver Disease
+63,34.99,79.21,A,No Liver Disease
+23,86.45,159.52,B,Liver Disease
+54,79.25,84.07,B,No Liver Disease
+41,41.54,89.44,A,No Liver Disease
+63,-3.52,94.44,C,Liver Disease
+70,44.65,172.0,A,Liver Disease
+77,,132.33,C,No Liver Disease
+80,41.48,144.14,A,Liver Disease
+49,46.68,124.9,C,No Liver Disease
+50,37.57,104.95,B,No Liver Disease
+84,63.82,135.78,C,Liver Disease
+35,50.95,81.08,A,Liver Disease
+42,64.27,92.62,B,Liver Disease
+71,68.33,138.32,C,Liver Disease
+75,17.39,86.07,C,Liver Disease
+84,38.44,115.27,C,Liver Disease
+63,40.64,116.41,C,Liver Disease
+41,88.57,106.78,C,No Liver Disease
+49,52.24,71.22,B,No Liver Disease
+64,62.19,104.28,B,Liver Disease
+40,21.79,99.38,B,Liver Disease
+83,52.15,124.04,B,Liver Disease
+44,64.67,122.76,A,Liver Disease
+19,62.93,129.45,B,No Liver Disease
+34,59.35,103.1,C,No Liver Disease
+50,50.2,133.07,C,No Liver Disease
+26,50.92,81.1,B,No Liver Disease
+60,24.6,74.45,C,Liver Disease
+65,36.49,61.61,B,No Liver Disease
+56,53.46,107.52,C,Liver Disease
+59,39.26,101.17,A,No Liver Disease
+43,60.33,139.73,A,Liver Disease
+67,57.0,103.78,B,No Liver Disease
+42,70.51,126.83,B,No Liver Disease
+41,64.37,140.33,B,Liver Disease
+30,53.41,102.84,C,Liver Disease
+77,61.22,127.45,B,No Liver Disease
+24,65.08,145.05,A,Liver Disease
+74,42.39,89.05,C,Liver Disease
+53,45.06,120.62,B,Liver Disease
+62,48.55,102.95,C,Liver Disease
+37,,90.64,C,No Liver Disease
+82,65.24,81.59,B,Liver Disease
+25,40.59,90.23,C,Liver Disease
+33,,121.5,A,Liver Disease
+31,44.5,79.73,A,Liver Disease
+32,57.09,106.23,C,Liver Disease
+83,,140.33,B,Liver Disease
+49,35.36,131.23,C,Liver Disease
+80,49.7,106.74,A,Liver Disease
+68,55.0,162.24,C,No Liver Disease
+42,49.04,167.33,C,Liver Disease
+75,29.86,120.65,A,Liver Disease
+80,75.52,58.29,C,Liver Disease
+79,51.32,142.16,C,Liver Disease
+39,38.09,62.65,B,Liver Disease
+75,74.31,156.9,B,Liver Disease
+75,59.26,147.09,A,No Liver Disease
+66,32.0,164.36,A,Liver Disease
+69,,126.51,A,Liver Disease
+59,46.66,110.97,B,No Liver Disease
+87,54.46,108.75,A,Liver Disease
+32,59.34,106.34,A,Liver Disease
+71,64.25,144.53,A,Liver Disease
+77,58.09,137.81,B,Liver Disease
+25,70.2,123.01,C,No Liver Disease
+70,51.9,101.95,A,No Liver Disease
+77,,185.73,C,No Liver Disease
+22,49.95,142.81,A,Liver Disease
+85,48.97,80.06,C,Liver Disease
+23,11.33,107.09,B,Liver Disease
+64,41.58,143.29,B,Liver Disease
+72,54.71,100.01,A,Liver Disease
+57,43.64,128.79,C,No Liver Disease
+69,40.31,143.77,B,Liver Disease
+33,63.67,35.29,A,Liver Disease
+30,36.25,117.3,A,Liver Disease
+47,,118.28,B,Liver Disease
+36,30.01,109.7,B,Liver Disease
+34,91.41,127.54,A,No Liver Disease
+80,46.76,136.44,C,Liver Disease
+36,45.15,123.55,C,No Liver Disease
+75,67.15,110.65,C,Liver Disease
+72,43.72,135.82,A,No Liver Disease
+79,71.82,121.23,B,No Liver Disease
+40,,114.23,A,Liver Disease
+26,48.22,87.19,B,Liver Disease
+29,46.62,80.93,C,No Liver Disease
+18,68.11,86.72,C,Liver Disease
+75,53.46,126.96,B,No Liver Disease
+18,56.48,118.02,B,Liver Disease
+51,58.12,82.99,A,Liver Disease
+65,51.99,136.15,C,No Liver Disease
+18,57.8,154.36,A,No Liver Disease
+33,48.23,105.04,A,Liver Disease
+78,49.25,76.48,A,No Liver Disease
+81,33.21,102.27,C,Liver Disease
+80,54.47,141.36,A,Liver Disease
+86,24.21,133.71,A,Liver Disease
+39,54.25,96.94,A,Liver Disease
+84,45.79,158.03,A,No Liver Disease
+43,55.62,153.71,A,Liver Disease
+33,34.27,101.67,A,Liver Disease
+68,18.21,101.42,C,Liver Disease
+74,44.74,105.18,A,Liver Disease
+46,34.31,107.32,B,Liver Disease
+86,23.29,143.76,A,No Liver Disease
+64,61.52,130.63,A,Liver Disease
+79,74.02,141.93,C,No Liver Disease
+86,38.05,136.84,C,No Liver Disease
+33,48.86,162.86,B,Liver Disease
+65,45.38,93.52,B,No Liver Disease
+56,40.12,129.51,C,No Liver Disease
+50,59.96,65.65,C,Liver Disease
+40,65.15,87.08,A,Liver Disease
+27,36.97,118.13,C,Liver Disease
+86,50.67,130.46,B,Liver Disease
+51,69.27,117.45,A,No Liver Disease
+69,60.34,105.82,B,Liver Disease
+27,62.57,110.26,A,No Liver Disease
+36,70.52,154.24,C,Liver Disease
+75,70.32,110.4,B,Liver Disease
+18,65.43,163.73,A,No Liver Disease
+86,52.17,139.85,A,Liver Disease
+21,44.26,131.44,C,Liver Disease
+33,51.55,90.16,C,Liver Disease
+41,41.98,143.38,C,Liver Disease
+19,20.71,107.66,B,Liver Disease
+49,45.81,90.14,A,Liver Disease
+41,55.36,132.82,C,Liver Disease
+29,41.19,85.3,B,No Liver Disease
+67,47.11,100.94,B,Liver Disease
+52,47.69,119.75,B,Liver Disease
+50,70.35,175.46,C,Liver Disease
+50,44.61,102.83,C,No Liver Disease
+78,70.35,108.54,A,Liver Disease
+68,9.31,138.31,A,Liver Disease
+60,70.22,89.04,C,Liver Disease
+29,69.46,131.07,B,Liver Disease
+84,63.53,150.15,B,No Liver Disease
+82,19.82,112.32,B,No Liver Disease
+50,65.28,145.65,A,Liver Disease
+57,49.25,127.29,B,Liver Disease
+60,12.06,101.73,A,Liver Disease
+61,69.47,115.05,A,No Liver Disease
+46,71.66,110.51,B,No Liver Disease
+30,21.43,117.81,B,Liver Disease
+29,52.63,123.82,C,No Liver Disease
+63,70.83,134.7,C,No Liver Disease
+19,68.45,132.72,B,Liver Disease
+52,62.54,59.21,A,Liver Disease
+25,10.29,117.57,A,Liver Disease
+43,60.94,82.26,A,No Liver Disease
+51,46.73,113.11,A,No Liver Disease
+24,64.94,116.91,A,No Liver Disease
+85,53.84,144.4,C,No Liver Disease
+75,49.7,119.25,B,Liver Disease
+46,59.61,126.48,C,No Liver Disease
+53,47.42,139.83,A,No Liver Disease
+38,49.64,150.69,A,Liver Disease
+53,41.67,116.92,A,Liver Disease
+27,25.92,122.35,A,No Liver Disease
+41,58.52,120.25,B,Liver Disease
+81,,106.44,A,No Liver Disease
+66,46.99,100.77,B,Liver Disease
+53,54.3,63.2,A,Liver Disease
+41,18.72,93.08,B,No Liver Disease
+40,22.08,75.53,C,Liver Disease
+79,45.5,151.38,A,Liver Disease
+54,56.82,124.71,B,Liver Disease
+29,61.16,116.85,C,No Liver Disease
+72,26.13,102.06,A,Liver Disease
+30,,120.74,A,No Liver Disease
+40,46.32,98.8,A,Liver Disease
+47,36.75,124.35,B,No Liver Disease
+34,,126.14,B,No Liver Disease
+79,,98.47,C,Liver Disease
+30,54.11,97.99,B,Liver Disease
+76,50.75,144.05,B,Liver Disease
+36,53.65,118.68,A,Liver Disease
+66,63.92,100.47,A,Liver Disease
+29,48.54,110.74,A,Liver Disease
+78,,94.74,A,Liver Disease
+36,67.07,118.32,A,Liver Disease
+26,45.03,140.79,A,Liver Disease
+88,59.27,119.31,A,Liver Disease
+45,42.44,179.09,C,No Liver Disease
+69,43.76,130.53,C,Liver Disease
+33,48.44,125.75,C,Liver Disease
+86,57.73,97.29,C,Liver Disease
+29,67.91,114.04,A,No Liver Disease
+42,51.45,100.52,C,No Liver Disease
+69,27.5,65.86,A,No Liver Disease
+70,59.47,144.36,C,No Liver Disease
+40,86.81,107.21,B,Liver Disease
+33,51.63,100.99,C,No Liver Disease
+74,24.37,125.26,C,No Liver Disease
+56,52.54,132.81,A,Liver Disease
+70,49.95,111.98,C,No Liver Disease
+59,48.69,119.93,B,Liver Disease
+75,64.18,138.65,A,Liver Disease
+56,70.67,111.0,A,Liver Disease
+31,60.25,127.56,C,Liver Disease
+22,48.0,78.52,A,No Liver Disease
+52,66.89,88.97,A,Liver Disease
+35,27.59,135.14,A,Liver Disease
+26,39.26,87.66,A,Liver Disease
+75,40.93,125.85,A,No Liver Disease
+34,49.54,116.33,A,Liver Disease
+24,57.6,110.89,B,Liver Disease
+63,46.99,99.29,C,No Liver Disease
+30,36.41,142.73,B,No Liver Disease
+57,64.62,163.25,A,Liver Disease
+59,46.47,127.5,A,No Liver Disease
+26,51.53,128.06,C,No Liver Disease
+67,58.27,102.94,B,No Liver Disease
+44,50.58,90.1,C,Liver Disease
+83,50.65,119.01,B,Liver Disease
+22,65.46,95.66,A,Liver Disease
+46,52.27,75.68,C,Liver Disease
+54,62.94,140.09,C,Liver Disease
+55,58.17,141.3,A,Liver Disease
+25,,98.53,C,Liver Disease
+82,56.14,126.1,B,Liver Disease
+34,59.57,145.05,B,Liver Disease
+88,66.52,125.13,B,No Liver Disease
+62,50.95,90.17,B,Liver Disease
+21,40.43,114.18,A,Liver Disease
+53,,153.17,C,No Liver Disease
+87,43.03,126.18,B,Liver Disease
+48,35.75,133.48,A,No Liver Disease
+36,54.77,128.54,C,No Liver Disease
+78,40.56,98.61,C,Liver Disease
+71,52.92,104.48,A,No Liver Disease
+56,47.62,128.47,A,Liver Disease
+36,49.38,140.42,B,Liver Disease
+56,58.34,147.5,C,Liver Disease
+84,41.87,98.55,C,Liver Disease
+62,59.58,130.83,A,No Liver Disease
+30,73.51,149.68,C,Liver Disease
+75,55.15,95.32,B,Liver Disease
+37,38.27,157.17,C,Liver Disease
+89,40.77,160.97,A,Liver Disease
+78,46.28,185.63,A,Liver Disease
+56,41.08,125.77,B,Liver Disease
+18,35.13,125.91,B,No Liver Disease
+20,52.32,140.67,C,Liver Disease
+79,46.68,139.95,C,Liver Disease
+80,52.85,148.16,A,Liver Disease
+42,67.8,139.6,B,Liver Disease
+73,46.45,117.35,B,No Liver Disease
+50,32.22,150.55,B,Liver Disease
+55,44.02,93.22,C,Liver Disease
+23,61.56,120.15,B,Liver Disease
+75,60.15,159.09,A,No Liver Disease
+61,57.78,88.74,A,Liver Disease
+62,40.63,103.06,C,Liver Disease
+49,61.28,136.79,C,No Liver Disease
+62,64.65,129.85,B,Liver Disease
+78,39.57,98.12,C,No Liver Disease
+64,49.38,109.6,A,No Liver Disease
+38,80.31,90.48,B,Liver Disease
+53,38.9,144.51,A,Liver Disease
+36,24.42,113.6,B,Liver Disease
+37,70.74,164.8,C,Liver Disease
+74,67.05,122.03,B,No Liver Disease
+35,43.15,114.51,B,Liver Disease
+64,48.31,112.08,A,Liver Disease
+66,31.63,113.9,A,No Liver Disease
+31,51.33,122.77,B,Liver Disease
+32,67.49,182.81,C,Liver Disease
+48,41.86,111.53,C,Liver Disease
+18,63.16,112.34,A,Liver Disease
+71,56.96,121.64,C,No Liver Disease
+20,58.67,147.26,A,Liver Disease
+33,42.74,84.48,C,Liver Disease
+74,44.68,131.38,B,Liver Disease
+29,22.3,99.56,A,Liver Disease
+33,41.5,133.83,A,Liver Disease
+89,67.45,107.66,B,Liver Disease
+41,36.06,62.4,A,Liver Disease
+45,38.3,129.24,C,No Liver Disease
+25,59.6,129.03,C,Liver Disease
+53,56.04,105.52,A,Liver Disease
+25,60.35,104.04,C,Liver Disease
+75,32.55,87.22,A,No Liver Disease
+77,,139.33,B,No Liver Disease
+67,31.76,142.06,A,Liver Disease
+45,52.31,98.02,B,No Liver Disease
+58,47.62,106.5,C,Liver Disease
+81,32.2,118.42,B,Liver Disease
+44,,176.77,C,Liver Disease
+80,50.35,133.63,A,Liver Disease
+34,40.25,96.41,C,No Liver Disease
+50,64.06,127.59,A,Liver Disease
+46,47.58,85.58,A,Liver Disease
+30,29.88,137.95,B,No Liver Disease
+63,28.61,161.89,B,Liver Disease
+52,59.09,161.99,B,Liver Disease
+23,27.7,138.37,B,Liver Disease
+86,54.75,105.41,C,Liver Disease
+64,56.67,87.48,C,Liver Disease
+42,35.07,84.99,C,Liver Disease
+83,63.36,49.84,A,Liver Disease
+27,24.23,137.35,C,Liver Disease
+73,54.45,117.43,C,No Liver Disease
+47,49.39,142.73,C,Liver Disease
+22,48.22,155.7,B,Liver Disease
+50,32.33,122.5,C,Liver Disease
+82,35.94,123.65,A,Liver Disease
+35,74.28,108.39,B,Liver Disease
+66,68.23,111.35,A,Liver Disease
