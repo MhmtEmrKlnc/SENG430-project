@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from ml.models import Project
 
 DOMAIN_METADATA = {
     "Cardiology": {"target": "DEATH_EVENT", "rows": 500, "classes": [0, 1]},
@@ -33,6 +34,10 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         datasets_dir = os.path.join(settings.BASE_DIR, 'default_datasets')
         os.makedirs(datasets_dir, exist_ok=True)
+
+        # Ensure that Project ID 1 exists because the frontend hardcodes requests to /projects/1/
+        Project.objects.get_or_create(id=1, defaults={"name": "Default Render Project"})
+
 
         for domain, meta in DOMAIN_METADATA.items():
             rows = meta["rows"]
