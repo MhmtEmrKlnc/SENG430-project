@@ -33,7 +33,7 @@ def step2_summary(request, project_id):
     if request.method != "GET":
         return JsonResponse({"error": "Only GET method is allowed."}, status=405)
 
-    project = get_object_or_404(Project, id=project_id)
+    project, _ = Project.objects.get_or_create(id=project_id, defaults={"name": "Render Auto Project"})
 
     try:
         summary = build_step2_summary(project)
@@ -47,7 +47,7 @@ def step2_upload(request, project_id):
     if request.method != "POST":
         return JsonResponse({"error": "Only POST method is allowed."}, status=405)
 
-    project = get_object_or_404(Project, id=project_id)
+    project, _ = Project.objects.get_or_create(id=project_id, defaults={"name": "Render Auto Project"})
 
     uploaded: UploadedFile | None = request.FILES.get("file")
     if not uploaded:
@@ -141,7 +141,7 @@ def set_domain_dataset(request, project_id):
     if request.method != "POST":
         return JsonResponse({"error": "Only POST method is allowed."}, status=405)
 
-    project = get_object_or_404(Project, id=project_id)
+    project, _ = Project.objects.get_or_create(id=project_id, defaults={"name": "Render Auto Project"})
 
     try:
         data = json.loads(request.body)
@@ -178,7 +178,7 @@ def column_mapper_save(request, project_id):
     if request.method != "POST":
         return JsonResponse({"error": "Only POST method is allowed."}, status=405)
 
-    project = get_object_or_404(Project, id=project_id)
+    project, _ = Project.objects.get_or_create(id=project_id, defaults={"name": "Render Auto Project"})
 
     try:
         data = json.loads(request.body)
@@ -228,7 +228,7 @@ def step3_apply(request, project_id):
     if request.method != "POST":
         return JsonResponse({"error": "Only POST method is allowed."}, status=405)
 
-    project = get_object_or_404(Project, id=project_id)
+    project, _ = Project.objects.get_or_create(id=project_id, defaults={"name": "Render Auto Project"})
 
     try:
         data = json.loads(request.body)
