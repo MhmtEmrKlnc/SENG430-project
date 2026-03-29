@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { KNNVisualisation } from './KNNVisualisation'
 import {
   Select,
   SelectContent,
@@ -53,6 +56,21 @@ const MODEL_OPTIONS: { value: ModelType; label: string; description: string }[] 
   },
 ]
 
+const ParamLabel = ({ label, tooltip }: { label: string; tooltip: string }) => (
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="cursor-help underline decoration-dotted underline-offset-2 transition-colors hover:text-brand-navy">
+          <Label className="cursor-help">{label}</Label>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs text-xs p-2">
+        <p>{tooltip}</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+)
+
 export function Step4ModelTraining() {
   const {
     processedDataset,
@@ -62,8 +80,10 @@ export function Step4ModelTraining() {
     comparisonRows,
     isTraining,
     trainingError,
+    autoRetrain,
     setSelectedModel,
     updateHyperparam,
+    setAutoRetrain,
     setTrainedModel,
     setIsTraining,
     setTrainingError,
@@ -90,6 +110,14 @@ export function Step4ModelTraining() {
       setIsTraining(false)
     }
   }
+
+  React.useEffect(() => {
+    if (!autoRetrain || !processedDataset || !selectedModel) return
+    const timer = setTimeout(() => {
+      handleTrain()
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [hyperparams[selectedModel], autoRetrain])
 
   function handleAddToComparison() {
     const result = trainedModels[selectedModel]
@@ -170,46 +198,59 @@ export function Step4ModelTraining() {
         {/* Hyperparameters + train */}
         <div className="lg:col-span-2 space-y-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Cpu className="h-4 w-4" />
                 Hyperparameters — {getModelLabel(selectedModel)}
               </CardTitle>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="auto-retrain" className="text-xs font-normal text-muted-foreground mr-1">Auto-Retrain</Label>
+                <Switch 
+                  id="auto-retrain" 
+                  checked={autoRetrain} 
+                  onCheckedChange={setAutoRetrain} 
+                />
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {selectedModel === 'knn' && (
-                <>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <Label>K (neighbours)</Label>
-                      <span className="font-semibold">{(hp as { k: number }).k}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <ParamLabel label="K (neighbours)" tooltip="How many similar historical patient cases to review when classifying a new patient." />
+                        <span className="font-semibold">{(hp as { k: number }).k}</span>
+                      </div>
+                      <Slider
+                        min={1} max={20} step={2}
+                        value={[(hp as { k: number }).k]}
+                        onValueChange={([v]) => updateHyperparam('knn', 'k', v)}
+                      />
                     </div>
-                    <Slider
-                      min={1} max={20} step={2}
-                      value={[(hp as { k: number }).k]}
-                      onValueChange={([v]) => updateHyperparam('knn', 'k', v)}
-                    />
+                    <div className="space-y-2">
+                      <ParamLabel label="Distance Metric" tooltip="The mathematical formula used to measure similarity between patients (e.g. straight-line vs block distance)." />
+                      <Select
+                        value={(hp as { distance: string }).distance}
+                        onValueChange={(v) => updateHyperparam('knn', 'distance', v)}
+                      >
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="euclidean">Euclidean</SelectItem>
+                          <SelectItem value="manhattan">Manhattan</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Distance Metric</Label>
-                    <Select
-                      value={(hp as { distance: string }).distance}
-                      onValueChange={(v) => updateHyperparam('knn', 'distance', v)}
-                    >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="euclidean">Euclidean</SelectItem>
-                        <SelectItem value="manhattan">Manhattan</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="flex justify-center items-center pt-4">
+                    <KNNVisualisation k={(hp as { k: number }).k} />
                   </div>
-                </>
+                </div>
               )}
 
               {selectedModel === 'svm' && (
                 <>
                   <div className="space-y-2">
-                    <Label>Kernel</Label>
+                    <ParamLabel label="Kernel" tooltip="The mathematical function used to transform patient data into higher dimensions to establish a clear separation boundary." />
                     <Select
                       value={(hp as { kernel: string }).kernel}
                       onValueChange={(v) => updateHyperparam('svm', 'kernel', v)}
@@ -223,7 +264,7 @@ export function Step4ModelTraining() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <Label>Regularisation (C)</Label>
+                      <ParamLabel label="Regularisation (C)" tooltip="Controls the trade-off. Lower C prefers a smoother boundary. Higher C tries to perfectly classify all training points but risks overfitting." />
                       <span className="font-semibold">{(hp as { C: number }).C}</span>
                     </div>
                     <Slider
@@ -238,7 +279,7 @@ export function Step4ModelTraining() {
               {selectedModel === 'decision_tree' && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <Label>Max Depth</Label>
+                    <ParamLabel label="Max Depth" tooltip="The maximum number of sequential questions (splits) the tree can ask. Too deep risks memorizing patient noise." />
                     <span className="font-semibold">{(hp as { maxDepth: number }).maxDepth}</span>
                   </div>
                   <Slider
@@ -253,7 +294,7 @@ export function Step4ModelTraining() {
                 <>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <Label>Number of Trees</Label>
+                      <ParamLabel label="Number of Trees" tooltip="How many individual decision trees to generate before combining their output for a more robust ensemble vote." />
                       <span className="font-semibold">{(hp as { nTrees: number }).nTrees}</span>
                     </div>
                     <Slider
@@ -264,7 +305,7 @@ export function Step4ModelTraining() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <Label>Max Depth</Label>
+                      <ParamLabel label="Max Depth" tooltip="The maximum depth allowed for each individual tree in the random forest ensemble." />
                       <span className="font-semibold">{(hp as { maxDepth: number }).maxDepth}</span>
                     </div>
                     <Slider
@@ -280,7 +321,7 @@ export function Step4ModelTraining() {
                 <>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <Label>Regularisation (C)</Label>
+                      <ParamLabel label="Regularisation (C)" tooltip="Inverse of regularisation strength. Smaller values specify stronger regularisation, creating a simpler model." />
                       <span className="font-semibold">{(hp as { C: number }).C}</span>
                     </div>
                     <Slider
@@ -291,7 +332,7 @@ export function Step4ModelTraining() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <Label>Max Iterations</Label>
+                      <ParamLabel label="Max Iterations" tooltip="The maximum number of times the algorithm tries to adjust its weights before concluding the optimization." />
                       <span className="font-semibold">{(hp as { maxIter: number }).maxIter}</span>
                     </div>
                     <Slider

@@ -120,6 +120,16 @@ export function Step5Results() {
         />
       )}
 
+      {/* Low Sensitivity Warning Banner */}
+      {metrics.sensitivity < 0.5 && (
+        <Banner
+          variant="error"
+          title="Danger: Low Sensitivity Alert (< 50%)"
+          message={`This model only identifies ${formatPercent(metrics.sensitivity)} of positive cases. Because it misses the majority of real cases, this configuration is extremely unsafe for clinical screening!`}
+          className="mb-6"
+        />
+      )}
+
       {/* Metrics grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
         {(
