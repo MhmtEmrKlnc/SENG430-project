@@ -17,7 +17,7 @@ router = APIRouter(tags=["certificate"])
 logger = logging.getLogger(__name__)
 
 
-@router.post("/certificate", response_model=CertificateResponse)
+@router.post("/generate-certificate", response_model=CertificateResponse)
 async def generate_certificate(req: CertificateRequest) -> CertificateResponse:
     """
     Generate a polished A4 PDF certificate that summarises the user's ML
@@ -42,3 +42,25 @@ async def generate_certificate(req: CertificateRequest) -> CertificateResponse:
 
     pdf_b64 = base64.b64encode(pdf_bytes).decode("utf-8")
     return CertificateResponse(pdf_base64=pdf_b64)
+
+@router.post("/generate-detailed-certificate", response_model=CertificateResponse)
+async def generate_detailed_certificate_route(req: CertificateRequest) -> CertificateResponse:
+    try:
+        pdf_bytes = pdf_generator.generate_certificate(
+            domain_label=req.domain_label,
+            model_type=req.model_type,
+            model_params=req.model_params,
+            metrics=req.metrics,
+            bias_summary=req.bias_summary,
+            checklist_items=[item.model_dump() for item in req.checklist_items],
+            generated_at=req.generated_at,
+            is_detailed=True,
+            feature_importance=req.feature_importance,
+        )
+    except Exception as exc:
+        logger.exception("Detailed PDF generation failed.")
+        raise HTTPException(status_code=500, detail=f"Detailed PDF generation failed: {exc}")
+
+    pdf_b64 = base64.b64encode(pdf_bytes).decode("utf-8")
+    return CertificateResponse(pdf_base64=pdf_b64)
+

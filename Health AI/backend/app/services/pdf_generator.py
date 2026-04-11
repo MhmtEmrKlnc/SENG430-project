@@ -18,8 +18,12 @@ from reportlab.platypus import (
     SimpleDocTemplate,
     Spacer,
     Table,
+    Table,
     TableStyle,
 )
+from reportlab.graphics.shapes import Drawing, String
+from reportlab.graphics.charts.barcharts import HorizontalBarChart
+
 
 # ---------------------------------------------------------------------------
 # Colour palette
@@ -134,6 +138,8 @@ def generate_certificate(
     bias_summary: List[Dict[str, Any]],
     checklist_items: List[Dict[str, Any]],
     generated_at: str,
+    is_detailed: bool = False,
+    feature_importance: List[Dict[str, Any]] = None,
 ) -> bytes:
     """
     Generate a polished A4 PDF certificate and return it as bytes.
@@ -326,6 +332,80 @@ def generate_certificate(
     story.append(Spacer(1, 8 * mm))
     story.append(_hr(color=MID_GREY, thickness=0.5))
     story.append(Spacer(1, 3 * mm))
+
+    if is_detailed:
+        if feature_importance:
+            story.append(Paragraph("AI Feature Importance Graphic", st["section_title"]))
+            story.append(Spacer(1, 3 * mm))
+            
+            top_features = sorted(feature_importance, key=lambda x: x.get("importance", 0), reverse=True)[:8]
+            top_features.reverse()  # For bottom-up drawing in HorizontalBarChart
+            
+            data = [[f.get("importance", 0) * 100 for f in top_features]]
+            labels = [f.get("feature", "unknown") for f in top_features]
+            
+            drawing = Drawing(400, 200)
+            bc = HorizontalBarChart()
+            bc.x = 120
+            bc.y = 20
+            bc.height = 160
+            bc.width = 250
+            bc.data = data
+            bc.categoryAxis.categoryNames = labels
+            bc.categoryAxis.labels.boxAnchor = 'e'
+            bc.categoryAxis.labels.dx = -5
+            bc.categoryAxis.labels.fontSize = 8
+            bc.valueAxis.valueMin = 0
+            bc.valueAxis.valueMax = max(100, (max(data[0]) if data[0] else 100))
+            bc.valueAxis.valueStep = 20
+            bc.valueAxis.labels.fontSize = 8
+            bc.bars[0].fillColor = BRAND_TEAL
+            bc.barSpacing = 2.5
+            bc.categoryAxis.strokeWidth = 0.5
+            bc.valueAxis.strokeWidth = 0.5
+            
+            drawing.add(bc)
+            story.append(drawing)
+            story.append(Spacer(1, 5 * mm))
+            story.append(_hr())
+
+        story.append(Paragraph("Detailed Model Configuration", st["section_title"]))
+        story.append(Spacer(1, 3 * mm))
+        
+        if model_params:
+            param_rows = [["Parameter", "Configured Value"]]
+            for k, v in model_params.items():
+                param_rows.append([str(k), str(v)])
+            
+            param_table = Table(param_rows, colWidths=[6 * cm, 6 * cm], hAlign="LEFT")
+            param_table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+                ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 10),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [WHITE, LIGHT_GREY]),
+                ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ]))
+            story.append(param_table)
+        else:
+            story.append(Paragraph("Default configurations used.", st["body"]))
+            
+        story.append(Spacer(1, 5 * mm))
+        story.append(_hr())
+        
+        story.append(Paragraph("Clinical Interpretability Notes", st["section_title"]))
+        story.append(Spacer(1, 3 * mm))
+        story.append(Paragraph(
+            "This model provides statistical associations and probabilistic predictions based purely on the historical training data "
+            "provided during the experimental session. These outputs do not supersede clinical judgment and do not prove causal "
+            "mechanisms. In a real-world setting, further verification against out-of-distribution demographic populations is required.", 
+            st["body"]
+        ))
+        
+        story.append(Spacer(1, 8 * mm))
+        story.append(_hr(color=MID_GREY, thickness=0.5))
+        story.append(Spacer(1, 3 * mm))
 
     # -----------------------------------------------------------------------
     # Footer

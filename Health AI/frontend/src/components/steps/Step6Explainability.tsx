@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Eye, Loader2, ChevronRight, User } from 'lucide-react'
+import { Eye, Loader2, ChevronRight, User, BarChart2 } from 'lucide-react'
 import {
   ResponsiveContainer,
   BarChart,
@@ -19,8 +19,14 @@ import { explainPrediction } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Banner } from '@/components/shared/Banner'
 import { formatPercent, getClassLabel } from '@/lib/utils'
 
@@ -85,6 +91,22 @@ export function Step6Explainability() {
     )
   }
 
+  // Feature importance chart (top 10), mapped to clinical labels
+  const topFeatures = [...(activeResults.featureImportance || [])]
+    .sort((a, b) => b.importance - a.importance)
+    .slice(0, 10)
+    .map((f) => ({
+      feature: domain?.featureLabels?.[f.feature] || f.feature,
+      importance: f.importance,
+    }))
+
+  const mappedContributions = explanationData
+    ? explanationData.contributions.map((c) => ({
+        ...c,
+        label: domain?.featureLabels?.[c.feature] || c.feature,
+      }))
+    : []
+
   return (
     <div className="step-container">
       {/* Header */}
@@ -95,13 +117,74 @@ export function Step6Explainability() {
         </div>
         <h1 className="step-heading">Why Did the Model Predict That?</h1>
         <p className="step-subheading">
-          Examine which features most influenced the model's prediction for an individual patient.
+          Examine which features most influenced the model's prediction overall and for an individual patient.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Overall Feature Importance block (spans 2 columns on lg) */}
+        <div className="lg:col-span-3">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <BarChart2 className="h-4 w-4" />
+                Overall Feature Importance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {topFeatures.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Feature importance is not available for this model type.
+                </p>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={topFeatures}
+                    layout="vertical"
+                    margin={{ top: 5, right: 20, bottom: 5, left: 180 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis
+                      type="number"
+                      domain={[0, 1]}
+                      tickFormatter={(v) => v.toFixed(2)}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <YAxis
+                      type="category"
+                      dataKey="feature"
+                      tick={{ fontSize: 11 }}
+                      width={175}
+                    />
+                    <RechartsTooltip
+                      formatter={(value: number) => [value.toFixed(4), 'Importance']}
+                    />
+                    <Bar dataKey="importance" radius={[0, 4, 4, 0]}>
+                      {topFeatures.map((_, i) => (
+                        <Cell
+                          key={i}
+                          fill={i === 0 ? '#1B3A6B' : i < 3 ? '#2563EB' : '#0D9488'}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+          
+          {domain?.clinicalSenseCheck && (
+            <Banner
+              variant="info"
+              title="Clinical Sense Check"
+              message={domain.clinicalSenseCheck}
+              className="mt-4"
+            />
+          )}
+        </div>
+
         {/* Patient selector */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
@@ -111,21 +194,24 @@ export function Step6Explainability() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <Label>Test Patient Index</Label>
-                  <span className="font-semibold text-brand-navy">
-                    #{selectedPatientIndex + 1}
-                  </span>
+                <div className="flex justify-between text-sm mb-1">
+                  <Label>Test Patient</Label>
                 </div>
-                <Slider
-                  min={0}
-                  max={Math.max(0, nTest - 1)}
-                  step={1}
-                  value={[selectedPatientIndex]}
-                  onValueChange={([v]) => setSelectedPatientIndex(v)}
-                />
+                <Select
+                  value={selectedPatientIndex.toString()}
+                  onValueChange={(val) => setSelectedPatientIndex(parseInt(val, 10))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a patient..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Patient A</SelectItem>
+                    <SelectItem value={Math.floor(nTest / 2).toString()}>Patient B</SelectItem>
+                    <SelectItem value={Math.max(0, nTest - 1).toString()}>Patient C</SelectItem>
+                  </SelectContent>
+                </Select>
                 <p className="text-xs text-muted-foreground">
-                  Patient {selectedPatientIndex + 1} of {nTest} in test set
+                  Select from representative test cases
                 </p>
               </div>
 
@@ -152,6 +238,12 @@ export function Step6Explainability() {
               </Button>
             </CardContent>
           </Card>
+
+          <Banner
+            variant="warning"
+            title="Important Clinical Reminder"
+            message="These explanations show associations between measurements and outcomes in the training data — they do not prove causation. A clinician must always decide whether and how to act on any AI prediction."
+          />
         </div>
 
         {/* Explanation */}
@@ -161,7 +253,7 @@ export function Step6Explainability() {
               <div className="text-center">
                 <Eye className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
                 <p className="text-sm text-muted-foreground">
-                  Select a patient and click "Explain" to see feature contributions.
+                  Select a patient and click "Explain This Patient" to see feature contributions.
                 </p>
               </div>
             </div>
@@ -218,21 +310,27 @@ export function Step6Explainability() {
                 </CardContent>
               </Card>
 
+              <Banner
+                variant="info"
+                title="What-if Analysis"
+                message="The bars below show how much each feature shifted the base probability for this specific patient."
+              />
+
               {/* Feature contributions waterfall */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Feature Contributions</CardTitle>
+                  <CardTitle className="text-base">Single-Patient Feature Contributions</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs text-muted-foreground mb-4">
-                    Bars pointing right (positive) push the prediction toward the positive class.
-                    Bars pointing left (negative) push toward the negative class.
+                    Bars pointing right (positive) push the prediction toward the positive outcome.
+                    Bars pointing left (negative) push toward the negative outcome (safe).
                   </p>
-                  <ResponsiveContainer width="100%" height={Math.max(200, explanationData.contributions.length * 32)}>
+                  <ResponsiveContainer width="100%" height={Math.max(200, mappedContributions.length * 32)}>
                     <BarChart
-                      data={explanationData.contributions}
+                      data={mappedContributions}
                       layout="vertical"
-                      margin={{ top: 5, right: 20, bottom: 5, left: 140 }}
+                      margin={{ top: 5, right: 20, bottom: 5, left: 180 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                       <XAxis type="number" tick={{ fontSize: 11 }} />
@@ -240,7 +338,7 @@ export function Step6Explainability() {
                         type="category"
                         dataKey="label"
                         tick={{ fontSize: 11 }}
-                        width={135}
+                        width={175}
                       />
                       <RechartsTooltip
                         formatter={(value: number, name: string) => [
@@ -250,10 +348,10 @@ export function Step6Explainability() {
                       />
                       <ReferenceLine x={0} stroke="#94a3b8" />
                       <Bar dataKey="contribution" radius={[0, 4, 4, 0]}>
-                        {explanationData.contributions.map((c, i) => (
+                        {mappedContributions.map((c, i) => (
                           <Cell
                             key={i}
-                            fill={c.contribution >= 0 ? '#0D9488' : '#DC2626'}
+                            fill={c.contribution >= 0 ? '#DC2626' : '#0D9488'} // positive is risk = red, negative is safe = green
                           />
                         ))}
                       </Bar>

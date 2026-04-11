@@ -445,7 +445,34 @@ export async function downloadCertificate(request: CertificateRequest): Promise<
   }
 
   try {
-    const r = await post<BackendCertificateResponse>('/api/certificate', body)
+    const r = await post<BackendCertificateResponse>('/api/generate-certificate', body)
+    return r.pdf_base64
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 422) {
+      throw new Error('Certificate generation failed. Ensure all required steps have been completed.')
+    }
+    throw new Error('Certificate download failed. Please try again or contact support.')
+  }
+}
+
+export async function downloadDetailedCertificate(request: CertificateRequest & { hyperparams: any, featureImportance: any[] }): Promise<string> {
+  const body = {
+    domain_label: request.domainId,
+    model_type: request.modelType,
+    model_params: request.hyperparams,
+    metrics: request.metrics,
+    bias_summary: [],
+    feature_importance: request.featureImportance,
+    checklist_items: request.checklistItems.map((item) => ({
+      label: item.label,
+      checked: item.checked,
+      pre_checked: item.preChecked,
+    })),
+    generated_at: request.completedAt,
+  }
+
+  try {
+    const r = await post<BackendCertificateResponse>('/api/generate-detailed-certificate', body)
     return r.pdf_base64
   } catch (err) {
     if (err instanceof ApiError && err.status === 422) {

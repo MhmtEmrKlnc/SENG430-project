@@ -38,14 +38,14 @@ const DEFAULT_CHECKLIST: ChecklistItem[] = [
     id: 'explanations',
     label: 'Model outputs include explanations',
     description: 'The AI provides reasons for each prediction, not just a result.',
-    checked: false,
+    checked: true,
     preChecked: true,
   },
   {
     id: 'data_documented',
     label: 'Training data source is documented',
     description: 'The origin and characteristics of the training data are recorded.',
-    checked: false,
+    checked: true,
     preChecked: true,
   },
   {

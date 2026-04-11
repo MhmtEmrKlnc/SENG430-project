@@ -187,28 +187,31 @@ def _guess_features(df: pd.DataFrame, target_col: str) -> List[str]:
 
 @router.get("/datasets/{domain_id}", response_model=DatasetResponse)
 async def get_dataset(domain_id: str) -> DatasetResponse:
-    meta = DOMAIN_META.get(domain_id)
-    if meta is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Domain '{domain_id}' not found. "
-                   f"Available domains: {list(DOMAIN_META.keys())}",
-        )
-
-    csv_path = DATA_DIR / meta["file"]
+    csv_path = DATA_DIR / f"{domain_id}.csv"
     if not csv_path.exists():
-        raise HTTPException(
-            status_code=503,
-            detail=f"Data file for domain '{domain_id}' is not available on the server.",
-        )
+        # Fallback to checking DOMAIN_META just in case
+        meta = DOMAIN_META.get(domain_id)
+        if meta and (DATA_DIR / meta["file"]).exists():
+            csv_path = DATA_DIR / meta["file"]
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Data file for domain '{domain_id}' is not available on the server.",
+            )
 
     try:
         df = pd.read_csv(csv_path)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to read CSV: {exc}")
 
-    target_col: str = meta["target"]
-    suggested: List[str] = [f for f in meta["suggested_features"] if f in df.columns]
+    # If it is in DOMAIN_META, use the guaranteed target/suggested. Otherwise guess automatically!
+    meta = DOMAIN_META.get(domain_id)
+    if meta:
+        target_col: str = meta["target"]
+        suggested: List[str] = [f for f in meta["suggested_features"] if f in df.columns]
+    else:
+        target_col = _guess_target(df)
+        suggested = _guess_features(df, target_col)
 
     return DatasetResponse(
         domain_id=domain_id,
