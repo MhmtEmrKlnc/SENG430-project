@@ -88,6 +88,7 @@ export function Step7Ethics() {
     }
   }
 
+
   async function handleDownloadDetailedCertificate() {
     if (!domain || !activeResults) return
     try {
@@ -98,6 +99,8 @@ export function Step7Ethics() {
         checklistItems,
         completedAt: new Date().toISOString(),
         hyperparams: activeResults.hyperparams,
+        confusionMatrix: activeResults.confusionMatrix || [],
+        biasSummary: biasData?.subgroups || [],
         featureImportance: activeResults.featureImportance.map((f) => ({
           feature: domain.featureLabels?.[f.feature] || f.feature,
           importance: f.importance

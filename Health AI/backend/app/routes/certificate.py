@@ -51,6 +51,7 @@ async def generate_detailed_certificate_route(req: CertificateRequest) -> Certif
             model_type=req.model_type,
             model_params=req.model_params,
             metrics=req.metrics,
+            confusion_matrix=req.confusion_matrix,
             bias_summary=req.bias_summary,
             checklist_items=[item.model_dump() for item in req.checklist_items],
             generated_at=req.generated_at,

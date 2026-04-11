@@ -23,6 +23,8 @@ from reportlab.platypus import (
 )
 from reportlab.graphics.shapes import Drawing, String
 from reportlab.graphics.charts.barcharts import HorizontalBarChart
+from reportlab.graphics.charts.spider import SpiderChart
+from reportlab.lib.colors import Color
 
 
 # ---------------------------------------------------------------------------
@@ -138,6 +140,7 @@ def generate_certificate(
     bias_summary: List[Dict[str, Any]],
     checklist_items: List[Dict[str, Any]],
     generated_at: str,
+    confusion_matrix: List[List[int]] = None,
     is_detailed: bool = False,
     feature_importance: List[Dict[str, Any]] = None,
 ) -> bytes:
@@ -334,6 +337,71 @@ def generate_certificate(
     story.append(Spacer(1, 3 * mm))
 
     if is_detailed:
+        story.append(Paragraph("Performance Metrics Overview", st["section_title"]))
+        story.append(Spacer(1, 4 * mm))
+        
+        # Spider Chart
+        acc = getattr(metrics, 'accuracy', 0) or 0
+        sens = getattr(metrics, 'sensitivity', 0) or 0
+        spec = getattr(metrics, 'specificity', 0) or 0
+        prec = getattr(metrics, 'precision', 0) or 0
+        f1 = getattr(metrics, 'f1', getattr(metrics, 'f1_score', 0)) or 0
+        
+        drawing = Drawing(400, 200)
+        sc = SpiderChart()
+        sc.x = 120
+        sc.y = 20
+        sc.width = 160
+        sc.height = 160
+        sc.data = [[acc * 100, sens * 100, spec * 100, prec * 100, f1 * 100]]
+        sc.labels = ['Accuracy', 'Sensitivity', 'Specificity', 'Precision', 'F1 Score']
+        sc.strands[0].fillColor = TEAL
+        sc.strands[0].strokeColor = TEAL
+        sc.strands[0].strokeWidth = 2
+        
+        drawing.add(sc)
+        story.append(drawing)
+        story.append(Spacer(1, 5 * mm))
+        story.append(_hr())
+
+        if confusion_matrix and len(confusion_matrix) > 0:
+            story.append(Paragraph("Confusion Matrix Heatmap", st["section_title"]))
+            story.append(Spacer(1, 3 * mm))
+            
+            # Find max val for color scaling
+            max_val = max(max(row) for row in confusion_matrix) if confusion_matrix else 1
+            if max_val == 0: max_val = 1
+            
+            headers = ["True \\ Pred"] + [f"Pred {i}" for i in range(len(confusion_matrix[0]))]
+            cm_data = [headers]
+            styles = [
+                ("BACKGROUND", (0, 0), (-1, 0), LIGHT_GREY),
+                ("TEXTCOLOR", (0, 0), (-1, 0), DARK_GREY),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("GRID", (0, 0), (-1, -1), 1, MID_GREY),
+                ("BACKGROUND", (0, 1), (0, -1), LIGHT_GREY),
+                ("FONTNAME", (0, 1), (0, -1), "Helvetica-Bold"),
+            ]
+            
+            for i, row in enumerate(confusion_matrix):
+                cm_data.append([f"True {i}"] + row)
+                for j, val in enumerate(row):
+                    ratio = val / max_val
+                    # Scale alpha between 0.05 and 0.9 depending on relative magnitude
+                    alpha = max(0.05, ratio * 0.9)
+                    cell_color = Color(13/255.0, 148/255.0, 136/255.0, alpha)
+                    text_col = WHITE if ratio > 0.5 else DARK_GREY
+                    styles.append(("BACKGROUND", (j+1, i+1), (j+1, i+1), cell_color))
+                    styles.append(("TEXTCOLOR", (j+1, i+1), (j+1, i+1), text_col))
+            
+            cm_table = Table(cm_data, colWidths=[2.5*cm] + [1.5*cm]*len(confusion_matrix[0]))
+            cm_table.setStyle(TableStyle(styles))
+            story.append(cm_table)
+            story.append(Spacer(1, 5 * mm))
+            story.append(_hr())
+
         if feature_importance:
             story.append(Paragraph("AI Feature Importance Graphic", st["section_title"]))
             story.append(Spacer(1, 3 * mm))
@@ -359,7 +427,7 @@ def generate_certificate(
             bc.valueAxis.valueMax = max(100, (max(data[0]) if data[0] else 100))
             bc.valueAxis.valueStep = 20
             bc.valueAxis.labels.fontSize = 8
-            bc.bars[0].fillColor = BRAND_TEAL
+            bc.bars[0].fillColor = TEAL
             bc.barSpacing = 2.5
             bc.categoryAxis.strokeWidth = 0.5
             bc.valueAxis.strokeWidth = 0.5
@@ -372,24 +440,51 @@ def generate_certificate(
         story.append(Paragraph("Detailed Model Configuration", st["section_title"]))
         story.append(Spacer(1, 3 * mm))
         
+        # Format model params neatly
         if model_params:
             param_rows = [["Parameter", "Configured Value"]]
             for k, v in model_params.items():
                 param_rows.append([str(k), str(v)])
-            
             param_table = Table(param_rows, colWidths=[6 * cm, 6 * cm], hAlign="LEFT")
             param_table.setStyle(TableStyle([
                 ("BACKGROUND", (0, 0), (-1, 0), NAVY),
                 ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
                 ("FONTSIZE", (0, 0), (-1, -1), 10),
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+                ("GRID", (0, 0), (-1, -1), 0.5, MID_GREY),
                 ("ROWBACKGROUNDS", (0, 1), (-1, -1), [WHITE, LIGHT_GREY]),
                 ("LEFTPADDING", (0, 0), (-1, -1), 6),
             ]))
             story.append(param_table)
         else:
             story.append(Paragraph("Default configurations used.", st["body"]))
+            
+        story.append(Spacer(1, 5 * mm))
+        story.append(_hr())
+
+        if bias_summary and len(bias_summary) > 0:
+            story.append(Paragraph("Subgroup Fairness Analysis", st["section_title"]))
+            story.append(Spacer(1, 3 * mm))
+            
+            fairness_data = [["Subgroup", "Sensitivity", "Specificity"]]
+            for g in bias_summary:
+                group_name = g.get("name", "Unknown")
+                sens = f"{g.get('sensitivity', 0)*100:.1f}%"
+                spec = f"{g.get('specificity', 0)*100:.1f}%"
+                fairness_data.append([group_name, sens, spec])
+                
+            ftable = Table(fairness_data, colWidths=[6*cm, 3.5*cm, 3.5*cm], hAlign="LEFT")
+            ftable.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), LIGHT_GREY),
+                ("TEXTCOLOR", (0, 0), (-1, 0), DARK_GREY),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("GRID", (0, 0), (-1, -1), 0.5, MID_GREY),
+                ("ALIGN", (1, 0), (-1, -1), "CENTER"),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [WHITE, LIGHT_GREY]),
+            ]))
+            story.append(ftable)
+            story.append(Spacer(1, 8 * mm))
+            story.append(_hr())
             
         story.append(Spacer(1, 5 * mm))
         story.append(_hr())

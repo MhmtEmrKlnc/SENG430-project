@@ -455,13 +455,14 @@ export async function downloadCertificate(request: CertificateRequest): Promise<
   }
 }
 
-export async function downloadDetailedCertificate(request: CertificateRequest & { hyperparams: any, featureImportance: any[] }): Promise<string> {
+export async function downloadDetailedCertificate(request: CertificateRequest & { hyperparams: any, featureImportance: any[], confusionMatrix: number[][], biasSummary: any[] }): Promise<string> {
   const body = {
     domain_label: request.domainId,
     model_type: request.modelType,
     model_params: request.hyperparams,
     metrics: request.metrics,
-    bias_summary: [],
+    confusion_matrix: request.confusionMatrix,
+    bias_summary: request.biasSummary,
     feature_importance: request.featureImportance,
     checklist_items: request.checklistItems.map((item) => ({
       label: item.label,

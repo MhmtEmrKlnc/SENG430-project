@@ -165,6 +165,7 @@ class CertificateRequest(BaseModel):
     model_type: str
     model_params: Dict[str, Any] = Field(default_factory=dict)
     metrics: MetricsResult
+    confusion_matrix: List[List[int]] = Field(default_factory=list)
     bias_summary: List[Dict[str, Any]] = Field(default_factory=list)
     feature_importance: List[Dict[str, Any]] = Field(default_factory=list)
     checklist_items: List[ChecklistItem] = Field(default_factory=list)
