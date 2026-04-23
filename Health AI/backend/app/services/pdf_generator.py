@@ -267,6 +267,12 @@ def generate_certificate(
     story.append(Spacer(1, 3 * mm))
 
     if bias_summary:
+        story.append(Paragraph(
+            f"<b>Baseline Metrics:</b> Overall Sensitivity: {metrics.sensitivity * 100:.1f}% | Overall Specificity: {metrics.specificity * 100:.1f}%",
+            st["body"]
+        ))
+        story.append(Spacer(1, 3 * mm))
+        
         bias_header = ["Subgroup", "Group", "N", "Sensitivity", "Specificity", "Δ Sens.", "Δ Spec.", "Status"]
         bias_rows = [bias_header]
         for sg in bias_summary:
@@ -361,6 +367,12 @@ def generate_certificate(
         
         drawing.add(sc)
         story.append(drawing)
+        story.append(Spacer(1, 3 * mm))
+        story.append(Paragraph(
+            "<b>Chart Interpretation:</b> This spider chart visualizes the multidimensional performance of the model across five key metrics. "
+            "A larger overall footprint indicates a more robust and balanced model performance. Imbalances highlight specific weaknesses, such as low sensitivity despite high accuracy.", 
+            st["body"]
+        ))
         story.append(Spacer(1, 5 * mm))
         story.append(_hr())
 
@@ -399,6 +411,13 @@ def generate_certificate(
             cm_table = Table(cm_data, colWidths=[2.5*cm] + [1.5*cm]*len(confusion_matrix[0]))
             cm_table.setStyle(TableStyle(styles))
             story.append(cm_table)
+            story.append(Spacer(1, 4 * mm))
+            story.append(Paragraph(
+                "<b>Heatmap Interpretation:</b> The confusion matrix displays the frequency of true versus predicted classifications. "
+                "The diagonal represents correct predictions, while off-diagonal elements indicate prediction errors (false positives and false negatives). "
+                "Darker shaded cells highlight higher concentrations of predictions.", 
+                st["body"]
+            ))
             story.append(Spacer(1, 5 * mm))
             story.append(_hr())
 
@@ -434,6 +453,12 @@ def generate_certificate(
             
             drawing.add(bc)
             story.append(drawing)
+            story.append(Spacer(1, 4 * mm))
+            story.append(Paragraph(
+                "<b>Graphic Interpretation:</b> This bar chart ranks the clinical features that most heavily influenced the model's predictions. "
+                "Longer bars indicate a stronger relative impact on the final decision boundary. Important note: High statistical importance implies predictive utility, but does not definitively prove a biological or causal relationship.", 
+                st["body"]
+            ))
             story.append(Spacer(1, 5 * mm))
             story.append(_hr())
 

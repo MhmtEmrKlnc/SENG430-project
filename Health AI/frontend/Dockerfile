@@ -1,7 +1,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm config set fetch-timeout 600000 && npm config set fetch-retries 5 && npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
@@ -11,6 +11,6 @@ ENV NODE_ENV=production
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/public ./public
+
 EXPOSE 3000
 CMD ["npm", "start"]

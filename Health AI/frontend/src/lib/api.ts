@@ -462,7 +462,16 @@ export async function downloadDetailedCertificate(request: CertificateRequest & 
     model_params: request.hyperparams,
     metrics: request.metrics,
     confusion_matrix: request.confusionMatrix,
-    bias_summary: request.biasSummary,
+    bias_summary: request.biasSummary.map((sg) => ({
+      name: sg.name,
+      group: sg.group,
+      n: sg.n,
+      sensitivity: sg.sensitivity,
+      specificity: sg.specificity,
+      delta_sensitivity: sg.deltaSensitivity,
+      delta_specificity: sg.deltaSpecificity,
+      status: sg.status,
+    })),
     feature_importance: request.featureImportance,
     checklist_items: request.checklistItems.map((item) => ({
       label: item.label,

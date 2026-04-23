@@ -4,8 +4,10 @@ import * as React from 'react'
 import { RotateCcw, HelpCircle } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
 import { DomainSelector } from './DomainSelector'
+import { LanguageSwitcher } from './LanguageSwitcher'
 import { HelpModal } from '@/components/shared/HelpModal'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from '@/lib/i18n'
 import {
   Dialog,
   DialogContent,
@@ -48,6 +50,7 @@ function HeartCircuitLogo({ className }: { className?: string }) {
 }
 
 export function Navbar() {
+  const { t } = useTranslation()
   const { resetAll, columnMapping, selectedDomainId, setCurrentStep } = useAppStore()
   const [resetDialogOpen, setResetDialogOpen] = React.useState(false)
   const [helpOpen, setHelpOpen] = React.useState(false)
@@ -84,14 +87,14 @@ export function Navbar() {
               <div className="min-w-0">
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg font-bold text-brand-navy tracking-tight leading-none">
-                    HEALTH-AI
+                    {t('nav.appName')}
                   </span>
                   <span className="hidden sm:inline text-sm font-medium text-muted-foreground leading-none">
-                    · ML Learning Tool
+                    · {t('nav.tagline')}
                   </span>
                 </div>
                 <p className="hidden md:block text-[10px] text-muted-foreground mt-0.5 leading-tight">
-                  Erasmus+ KA220-HED · For Healthcare Professionals
+                  {t('nav.professionals')}
                 </p>
               </div>
             </div>
@@ -99,20 +102,21 @@ export function Navbar() {
             {/* Center: Erasmus note (large screens) */}
             <div className="hidden lg:flex flex-1 justify-center">
               <span className="text-xs text-muted-foreground">
-                Erasmus+ KA220-HED · Interactive ML Education for Clinical Teams
+                {t('nav.erasmus')}
               </span>
             </div>
 
             {/* Right: Domain selector + actions */}
             <div className="flex items-center gap-2 shrink-0">
+              <LanguageSwitcher />
               <DomainSelector />
 
               <Button
                 variant="ghost"
                 size="icon-sm"
                 onClick={handleResetClick}
-                title="Reset progress"
-                aria-label="Reset all progress"
+                title={t('common.reset')}
+                aria-label={t('common.reset')}
                 className="text-muted-foreground hover:text-clinical-danger hover:bg-clinical-danger/10"
               >
                 <RotateCcw className="h-4 w-4" />
@@ -122,8 +126,8 @@ export function Navbar() {
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => setHelpOpen(true)}
-                title="Help & Glossary"
-                aria-label="Open help and glossary"
+                title={t('common.help')}
+                aria-label={t('common.help')}
                 className="text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/10"
               >
                 <HelpCircle className="h-4 w-4" />
@@ -139,19 +143,18 @@ export function Navbar() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <RotateCcw className="h-5 w-5 text-clinical-warning" />
-              Reset All Progress?
+              {t('common.resetTitle')}
             </DialogTitle>
             <DialogDescription>
-              This will clear your dataset, trained models, and all results. You will return to
-              Step 1. This cannot be undone.
+              {t('common.resetDesc')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setResetDialogOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleConfirmReset}>
-              Reset Everything
+              {t('common.confirmReset')}
             </Button>
           </DialogFooter>
         </DialogContent>

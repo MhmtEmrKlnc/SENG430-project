@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
 import { DOMAINS, getDomainById } from '@/lib/domains'
+import { useTranslation } from '@/lib/i18n'
 import { DomainSelector } from '@/components/layout/DomainSelector'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +21,7 @@ import { InfoCard, InfoRow } from '@/components/shared/InfoCard'
 import { cn } from '@/lib/utils'
 
 export function Step1ClinicalContext() {
+  const { t } = useTranslation()
   const { selectedDomainId, setCurrentStep } = useAppStore()
   const domain = selectedDomainId ? getDomainById(selectedDomainId) : null
 
@@ -29,19 +31,18 @@ export function Step1ClinicalContext() {
         <div className="text-center py-16">
           <Stethoscope className="mx-auto h-16 w-16 text-brand-teal/40 mb-6" />
           <h1 className="text-3xl font-bold text-brand-navy mb-3">
-            HEALTH-AI · ML Learning Tool
+            {t('steps.1.startHeading')}
           </h1>
           <p className="text-muted-foreground text-lg mb-2 max-w-xl mx-auto">
-            An interactive learning platform for healthcare professionals to understand and build
-            clinical machine learning models.
+            {t('steps.1.startDesc')}
           </p>
           <p className="text-sm text-muted-foreground mb-8">
-            Erasmus+ KA220-HED · 20 Clinical Specialties · 6 ML Algorithms
+            {t('steps.1.startErasmus')}
           </p>
 
           <div className="flex flex-col items-center gap-4">
             <p className="text-sm font-medium text-foreground">
-              Start by selecting a clinical specialty:
+              {t('steps.1.selectSpecialty')}
             </p>
             <DomainSelector />
           </div>
@@ -68,9 +69,9 @@ export function Step1ClinicalContext() {
                     size="sm"
                     className="text-[10px]"
                   >
-                    {d.taskType}
+                    {d.taskType === 'binary' ? t('steps.1.binaryClassification') : t('steps.1.multiclassClassification')}
                   </Badge>
-                  <span className="text-[10px] text-muted-foreground">~{d.estimatedMinutes}m</span>
+                  <span className="text-[10px] text-muted-foreground">~{d.estimatedMinutes}{t('steps.1.minutes').charAt(0)}</span>
                 </div>
               </button>
             ))}
@@ -85,8 +86,8 @@ export function Step1ClinicalContext() {
       {/* Step header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Badge variant="teal" size="sm">Step 1</Badge>
-          <span className="text-xs text-muted-foreground">Clinical Context</span>
+          <Badge variant="teal" size="sm">{t('common.step')} 1</Badge>
+          <span className="text-xs text-muted-foreground">{t('steps.1.label')}</span>
         </div>
         <h1 className="step-heading">{domain.label}</h1>
         <p className="step-subheading">{domain.specialty}</p>
@@ -99,7 +100,7 @@ export function Step1ClinicalContext() {
             <HelpCircle className="h-5 w-5 text-brand-navy shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-brand-navy/70 mb-1">
-                Clinical Question
+                {t('steps.1.clinicalQuestion')}
               </p>
               <p className="text-base font-medium text-brand-navy leading-snug">
                 {domain.clinicalQuestion}
@@ -114,7 +115,7 @@ export function Step1ClinicalContext() {
         {/* Left: Why it matters + context */}
         <div className="space-y-4">
           <InfoCard
-            title="Why This Matters Clinically"
+            title={t('steps.1.whyItMatters')}
             icon={<Target className="h-4 w-4" />}
             variant="clinical"
           >
@@ -124,7 +125,7 @@ export function Step1ClinicalContext() {
           </InfoCard>
 
           <InfoCard
-            title="Clinical Context"
+            title={t('steps.1.clinicalContext')}
             icon={<BookOpen className="h-4 w-4" />}
           >
             <p className="text-sm text-foreground leading-relaxed">
@@ -135,37 +136,37 @@ export function Step1ClinicalContext() {
 
         {/* Right: Summary table */}
         <div className="space-y-4">
-          <InfoCard title="Study Overview" icon={<Users className="h-4 w-4" />}>
+          <InfoCard title={t('steps.1.studyOverview')} icon={<Users className="h-4 w-4" />}>
             <div className="space-y-0">
-              <InfoRow label="Patient Population" value={domain.patientPopulation} />
-              <InfoRow label="Predicted Outcome" value={domain.predictedOutcome} />
+              <InfoRow label={t('steps.1.patientPopulation')} value={domain.patientPopulation} />
+              <InfoRow label={t('steps.1.predictedOutcome')} value={domain.predictedOutcome} />
               <InfoRow
-                label="Task Type"
+                label={t('steps.1.taskType')}
                 value={
                   <Badge variant={domain.taskType === 'binary' ? 'light' : 'info'} size="sm">
-                    {domain.taskType === 'binary' ? 'Binary Classification' : 'Multiclass Classification'}
+                    {domain.taskType === 'binary' ? t('steps.1.binaryClassification') : t('steps.1.multiclassClassification')}
                   </Badge>
                 }
               />
               <InfoRow
-                label="Outcome Classes"
+                label={t('steps.1.outcomeClasses')}
                 value={
                   <span className="text-right">
                     {domain.classLabels.map((label, i) => (
                       <span key={i} className="block text-xs">
-                        Class {i}: {label}
+                        {t('common.step').charAt(0) === 'A' ? 'Sınıf' : 'Class'} {i}: {label}
                       </span>
                     ))}
                   </span>
                 }
               />
-              <InfoRow label="Data Source" value={domain.sampleDataSource} />
+              <InfoRow label={t('steps.1.dataSource')} value={domain.sampleDataSource} />
               <InfoRow
-                label="Estimated Time"
+                label={t('steps.1.estimatedTime')}
                 value={
                   <span className="flex items-center gap-1 justify-end">
                     <Clock className="h-3.5 w-3.5" />
-                    ~{domain.estimatedMinutes} minutes
+                    ~{domain.estimatedMinutes} {t('steps.1.minutes')}
                   </span>
                 }
               />
@@ -173,7 +174,7 @@ export function Step1ClinicalContext() {
           </InfoCard>
 
           {/* Suggested features preview */}
-          <InfoCard title="Key Clinical Features" icon={<Stethoscope className="h-4 w-4" />}>
+          <InfoCard title={t('steps.1.keyFeatures')} icon={<Stethoscope className="h-4 w-4" />}>
             <div className="flex flex-wrap gap-2">
               {domain.suggestedFeatures.map((feat) => (
                 <Badge key={feat} variant="outline" size="sm">
@@ -182,7 +183,7 @@ export function Step1ClinicalContext() {
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              {domain.suggestedFeatures.length} suggested features (you can customise in Step 2)
+              {domain.suggestedFeatures.length} {t('steps.1.suggestedFeaturesDesc')}
             </p>
           </InfoCard>
         </div>
@@ -195,7 +196,7 @@ export function Step1ClinicalContext() {
           size="lg"
           onClick={() => setCurrentStep(2)}
         >
-          Explore the Data
+          {t('common.exploreData')}
           <ChevronRight className="h-5 w-5" />
         </Button>
       </div>

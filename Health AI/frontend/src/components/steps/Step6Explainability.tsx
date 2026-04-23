@@ -15,6 +15,7 @@ import {
 } from 'recharts'
 import { useAppStore } from '@/lib/store'
 import { getDomainById } from '@/lib/domains'
+import { useTranslation } from '@/lib/i18n'
 import { explainPrediction } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -31,6 +32,7 @@ import { Banner } from '@/components/shared/Banner'
 import { formatPercent, getClassLabel } from '@/lib/utils'
 
 export function Step6Explainability() {
+  const { t } = useTranslation()
   const {
     selectedDomainId,
     activeResults,
@@ -84,8 +86,8 @@ export function Step6Explainability() {
       <div className="step-container">
         <Banner
           variant="warning"
-          title="No active model"
-          message="Train and select a model in Step 4, then view results in Step 5 before using Explainability."
+          title={t('steps.6.noModelTitle')}
+          message={t('steps.6.noModelMsg')}
         />
       </div>
     )
@@ -112,12 +114,12 @@ export function Step6Explainability() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Badge variant="teal" size="sm">Step 6</Badge>
-          <span className="text-xs text-muted-foreground">Explainability</span>
+          <Badge variant="teal" size="sm">{t('common.step')} 6</Badge>
+          <span className="text-xs text-muted-foreground">{t('steps.6.label')}</span>
         </div>
-        <h1 className="step-heading">Why Did the Model Predict That?</h1>
+        <h1 className="step-heading">{t('steps.6.heading')}</h1>
         <p className="step-subheading">
-          Examine which features most influenced the model's prediction overall and for an individual patient.
+          {t('steps.6.subheading')}
         </p>
       </div>
 
@@ -128,13 +130,13 @@ export function Step6Explainability() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <BarChart2 className="h-4 w-4" />
-                Overall Feature Importance
+                {t('steps.6.overallImportance')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {topFeatures.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  Feature importance is not available for this model type.
+                  {t('steps.6.importanceDesc')}
                 </p>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
@@ -157,7 +159,7 @@ export function Step6Explainability() {
                       width={175}
                     />
                     <RechartsTooltip
-                      formatter={(value: number) => [value.toFixed(4), 'Importance']}
+                      formatter={(value: number) => [value.toFixed(4), t('steps.6.importanceLabel')]}
                     />
                     <Bar dataKey="importance" radius={[0, 4, 4, 0]}>
                       {topFeatures.map((_, i) => (
@@ -176,7 +178,7 @@ export function Step6Explainability() {
           {domain?.clinicalSenseCheck && (
             <Banner
               variant="info"
-              title="Clinical Sense Check"
+              title={t('steps.5.clinicalSenseCheck')}
               message={domain.clinicalSenseCheck}
               className="mt-4"
             />
@@ -189,36 +191,36 @@ export function Step6Explainability() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <User className="h-4 w-4" />
-                Select Patient
+                {t('steps.6.selectPatient')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between text-sm mb-1">
-                  <Label>Test Patient</Label>
+                  <Label>{t('steps.6.testPatient')}</Label>
                 </div>
                 <Select
                   value={selectedPatientIndex.toString()}
                   onValueChange={(val) => setSelectedPatientIndex(parseInt(val, 10))}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a patient..." />
+                    <SelectValue placeholder={t('steps.6.selectPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Patient A</SelectItem>
-                    <SelectItem value={Math.floor(nTest / 2).toString()}>Patient B</SelectItem>
-                    <SelectItem value={Math.max(0, nTest - 1).toString()}>Patient C</SelectItem>
+                    <SelectItem value="0">{t('steps.6.patientA')}</SelectItem>
+                    <SelectItem value={Math.floor(nTest / 2).toString()}>{t('steps.6.patientB')}</SelectItem>
+                    <SelectItem value={Math.max(0, nTest - 1).toString()}>{t('steps.6.patientC')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Select from representative test cases
+                  {t('steps.6.selectDesc')}
                 </p>
               </div>
 
               {processedDataset && domain && (
                 <div className="rounded-lg bg-surface border border-border-subtle p-3 space-y-1.5">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Actual Outcome
+                    {t('steps.6.actualOutcome')}
                   </p>
                   <Badge variant={processedDataset.yTest[selectedPatientIndex] === 0 ? 'success' : 'warning'}>
                     {getClassLabel(domain, processedDataset.yTest[selectedPatientIndex] ?? 0)}
@@ -234,15 +236,15 @@ export function Step6Explainability() {
                 disabled={isExplaining}
               >
                 <Eye className="h-4 w-4" />
-                {isExplaining ? 'Explaining...' : 'Explain This Patient'}
+                {isExplaining ? t('steps.6.explaining') : t('steps.6.explainPatient')}
               </Button>
             </CardContent>
           </Card>
 
           <Banner
             variant="warning"
-            title="Important Clinical Reminder"
-            message="These explanations show associations between measurements and outcomes in the training data — they do not prove causation. A clinician must always decide whether and how to act on any AI prediction."
+            title={t('steps.6.clinicalReminderTitle')}
+            message={t('steps.6.clinicalReminderMsg')}
           />
         </div>
 
@@ -253,7 +255,7 @@ export function Step6Explainability() {
               <div className="text-center">
                 <Eye className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
                 <p className="text-sm text-muted-foreground">
-                  Select a patient and click "Explain This Patient" to see feature contributions.
+                  {t('steps.6.selectToSee')}
                 </p>
               </div>
             </div>
@@ -262,7 +264,7 @@ export function Step6Explainability() {
           {isExplaining && (
             <div className="flex items-center gap-3 p-8 rounded-xl border border-border-subtle bg-surface-card">
               <Loader2 className="h-5 w-5 animate-spin text-brand-teal" />
-              <span className="text-sm text-muted-foreground">Generating explanation...</span>
+              <span className="text-sm text-muted-foreground">{t('steps.6.generating')}</span>
             </div>
           )}
 
@@ -273,7 +275,7 @@ export function Step6Explainability() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between gap-4 flex-wrap">
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Model Prediction</p>
+                      <p className="text-xs text-muted-foreground mb-1">{t('steps.6.modelPrediction')}</p>
                       <Badge
                         variant={explanationData.prediction === 0 ? 'success' : 'warning'}
                         size="lg"
@@ -282,7 +284,7 @@ export function Step6Explainability() {
                       </Badge>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground mb-1">Confidence</p>
+                      <p className="text-xs text-muted-foreground mb-1">{t('steps.6.confidence')}</p>
                       <span className="text-2xl font-bold text-brand-navy">
                         {formatPercent(
                           Math.max(...explanationData.probability)
@@ -290,7 +292,7 @@ export function Step6Explainability() {
                       </span>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Actual Outcome</p>
+                      <p className="text-xs text-muted-foreground mb-1">{t('steps.6.actualOutcome')}</p>
                       <Badge
                         variant={actualLabel === predictedLabel ? 'success' : 'destructive'}
                         size="lg"
@@ -303,7 +305,7 @@ export function Step6Explainability() {
                         variant={isCorrect ? 'success' : 'destructive'}
                         size="md"
                       >
-                        {isCorrect ? 'Correct' : 'Incorrect'}
+                        {isCorrect ? t('steps.6.correct') : t('steps.6.incorrect')}
                       </Badge>
                     </div>
                   </div>
@@ -312,19 +314,18 @@ export function Step6Explainability() {
 
               <Banner
                 variant="info"
-                title="What-if Analysis"
-                message="The bars below show how much each feature shifted the base probability for this specific patient."
+                title={t('steps.6.whatIfTitle')}
+                message={t('steps.6.whatIfMsg')}
               />
 
               {/* Feature contributions waterfall */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Single-Patient Feature Contributions</CardTitle>
+                  <CardTitle className="text-base">{t('steps.6.patientContributions')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs text-muted-foreground mb-4">
-                    Bars pointing right (positive) push the prediction toward the positive outcome.
-                    Bars pointing left (negative) push toward the negative outcome (safe).
+                    {t('steps.6.contributionDesc')}
                   </p>
                   <ResponsiveContainer width="100%" height={Math.max(200, mappedContributions.length * 32)}>
                     <BarChart
@@ -343,7 +344,7 @@ export function Step6Explainability() {
                       <RechartsTooltip
                         formatter={(value: number, name: string) => [
                           value.toFixed(4),
-                          'Contribution',
+                          t('steps.6.contributionLabel'),
                         ]}
                       />
                       <ReferenceLine x={0} stroke="#94a3b8" />
@@ -367,7 +368,7 @@ export function Step6Explainability() {
       {/* Navigation */}
       <div className="flex justify-end mt-6">
         <Button variant="teal" size="lg" onClick={() => setCurrentStep(7)}>
-          Ethics & Bias Review
+          {t('steps.6.continue')}
           <ChevronRight className="h-5 w-5" />
         </Button>
       </div>

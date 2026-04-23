@@ -13,6 +13,7 @@ import {
 import { useAppStore } from '@/lib/store'
 import { getDomainById } from '@/lib/domains'
 import { fetchDataset, uploadCSV } from '@/lib/api'
+import { useTranslation } from '@/lib/i18n'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -24,6 +25,7 @@ import { cn, toTitleCase } from '@/lib/utils'
 import type { ColumnMapping, ColumnInfo } from '@/lib/types'
 
 export function Step2DataExploration() {
+  const { t } = useTranslation()
   const {
     selectedDomainId,
     dataSource,
@@ -73,7 +75,7 @@ export function Step2DataExploration() {
       const result = await fetchDataset(domain.datasetId)
       setRawData(result.rows, result.columns, result.rowCount)
     } catch (err) {
-      setDataError(err instanceof Error ? err.message : 'Failed to load dataset.')
+      setDataError(err instanceof Error ? err.message : t('steps.2.loadingDataset'))
     } finally {
       setIsLoadingData(false)
     }
@@ -89,7 +91,7 @@ export function Step2DataExploration() {
       const result = await uploadCSV(file)
       setRawData(result.rows, result.columns, result.rowCount)
     } catch (err) {
-      setDataError(err instanceof Error ? err.message : 'CSV upload failed.')
+      setDataError(err instanceof Error ? err.message : t('steps.2.uploadCSV'))
     } finally {
       setIsLoadingData(false)
       e.target.value = ''
@@ -126,8 +128,8 @@ export function Step2DataExploration() {
       <div className="step-container">
         <Banner
           variant="warning"
-          title="No specialty selected"
-          message="Please select a clinical specialty in Step 1 before loading data."
+          title={t('steps.2.noSpecialtyTitle')}
+          message={t('steps.2.noSpecialtyMsg')}
         />
       </div>
     )
@@ -138,12 +140,12 @@ export function Step2DataExploration() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Badge variant="teal" size="sm">Step 2</Badge>
-          <span className="text-xs text-muted-foreground">Data Exploration</span>
+          <Badge variant="teal" size="sm">{t('common.step')} 2</Badge>
+          <span className="text-xs text-muted-foreground">{t('steps.2.label')}</span>
         </div>
-        <h1 className="step-heading">Explore the Dataset</h1>
+        <h1 className="step-heading">{t('steps.2.heading')}</h1>
         <p className="step-subheading">
-          Load clinical data, review column statistics, and select your features.
+          {t('steps.2.subheading')}
         </p>
       </div>
 
@@ -151,7 +153,7 @@ export function Step2DataExploration() {
       {rawData.length === 0 && !isLoadingData && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-base">Choose Data Source</CardTitle>
+            <CardTitle className="text-base">{t('steps.2.chooseSource')}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
             <Button
@@ -161,7 +163,7 @@ export function Step2DataExploration() {
               disabled={isLoadingData}
             >
               <Database className="h-4 w-4" />
-              Load Built-in Dataset
+              {t('steps.2.loadBuiltin')}
             </Button>
             <div className="flex-1">
               <label className="w-full">
@@ -173,7 +175,7 @@ export function Step2DataExploration() {
                 >
                   <span>
                     <Upload className="h-4 w-4" />
-                    Upload Your CSV
+                    {t('steps.2.uploadCSV')}
                   </span>
                 </Button>
                 <input
@@ -193,7 +195,7 @@ export function Step2DataExploration() {
       {isLoadingData && (
         <div className="flex items-center gap-3 p-6 rounded-xl border border-border-subtle bg-surface-card">
           <Loader2 className="h-5 w-5 animate-spin text-brand-teal" />
-          <span className="text-sm text-muted-foreground">Loading dataset...</span>
+          <span className="text-sm text-muted-foreground">{t('steps.2.loadingDataset')}</span>
         </div>
       )}
 
@@ -201,7 +203,7 @@ export function Step2DataExploration() {
       {dataError && (
         <Banner
           variant="error"
-          title="Data Loading Error"
+          title={t('steps.2.loadErrorTitle')}
           message={dataError}
           dismissible
           className="mb-4"
@@ -214,15 +216,15 @@ export function Step2DataExploration() {
           {/* Dataset summary */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             {[
-              { label: 'Rows', value: rowCount.toLocaleString() },
-              { label: 'Columns', value: columns.length.toString() },
+              { label: t('steps.2.rows'), value: rowCount.toLocaleString() },
+              { label: t('steps.2.columns'), value: columns.length.toString() },
               {
-                label: 'Missing Values',
+                label: t('steps.2.missingValues'),
                 value: `${columns.filter((c) => c.missingCount > 0).length} cols`,
               },
               {
-                label: 'Source',
-                value: dataSource === 'builtin' ? 'Built-in' : 'Uploaded',
+                label: t('steps.2.source'),
+                value: dataSource === 'builtin' ? t('steps.2.builtin') : t('steps.2.uploaded'),
               },
             ].map((stat) => (
               <div
@@ -243,7 +245,7 @@ export function Step2DataExploration() {
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <BarChart2 className="h-4 w-4" />
-                    Column Overview
+                    {t('steps.2.columnOverview')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -252,19 +254,19 @@ export function Step2DataExploration() {
                       <thead>
                         <tr className="border-b border-border-subtle bg-surface">
                           <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Column
+                            {t('steps.2.column')}
                           </th>
                           <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Type
+                            {t('steps.2.type')}
                           </th>
                           <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Missing
+                            {t('steps.2.missing')}
                           </th>
                           <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Unique
+                            {t('steps.2.unique')}
                           </th>
                           <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Role
+                            {t('steps.2.role')}
                           </th>
                         </tr>
                       </thead>
@@ -320,11 +322,11 @@ export function Step2DataExploration() {
                               </td>
                               <td className="px-4 py-2">
                                 {isTarget ? (
-                                  <Badge variant="teal" size="sm">Target</Badge>
+                                  <Badge variant="teal" size="sm">{t('steps.2.target')}</Badge>
                                 ) : isFeature ? (
-                                  <Badge variant="success" size="sm">Feature</Badge>
+                                  <Badge variant="success" size="sm">{t('steps.2.feature')}</Badge>
                                 ) : (
-                                  <Badge variant="outline" size="sm">Excluded</Badge>
+                                  <Badge variant="outline" size="sm">{t('steps.2.excluded')}</Badge>
                                 )}
                               </td>
                             </tr>
@@ -341,13 +343,13 @@ export function Step2DataExploration() {
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Column Mapping</CardTitle>
+                  <CardTitle className="text-base">{t('steps.2.mappingTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Target column */}
                   <div>
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 block">
-                      Target (Outcome) Column
+                      {t('steps.2.targetOutcome')}
                     </Label>
                     <div className="space-y-1">
                       {columns.map((col) => (
@@ -379,7 +381,7 @@ export function Step2DataExploration() {
                   {/* Feature columns */}
                   <div>
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 block">
-                      Feature Columns ({localFeatures.size} selected)
+                      {t('steps.2.featuresSelected')} ({localFeatures.size} {t('steps.2.source').charAt(0) === 'K' ? 'seçildi' : 'selected'})
                     </Label>
                     <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                       {columns
@@ -405,7 +407,7 @@ export function Step2DataExploration() {
                   {localFeatures.size < 2 && (
                     <Banner
                       variant="warning"
-                      message="Select at least 2 feature columns."
+                      message={t('steps.2.selectAtLeast2')}
                       icon={false}
                     />
                   )}
@@ -419,12 +421,12 @@ export function Step2DataExploration() {
                     {columnMapping ? (
                       <>
                         <CheckCircle2 className="h-4 w-4" />
-                        Update Mapping
+                        {t('steps.2.updateMapping')}
                       </>
                     ) : (
                       <>
                         <ChevronRight className="h-4 w-4" />
-                        Apply & Continue
+                        {t('steps.2.applyContinue')}
                       </>
                     )}
                   </Button>
@@ -432,7 +434,7 @@ export function Step2DataExploration() {
                   {columnMapping && (
                     <div className="flex items-center gap-2 text-xs text-clinical-success">
                       <CheckCircle2 className="h-3.5 w-3.5" />
-                      Mapping applied — Step 3 unlocked
+                      {t('steps.2.mappingApplied')}
                     </div>
                   )}
                 </CardContent>
@@ -450,7 +452,7 @@ export function Step2DataExploration() {
                 }}
               >
                 <AlertCircle className="h-3.5 w-3.5" />
-                Load Different Data
+                {t('steps.2.loadDifferent')}
               </Button>
             </div>
           </div>

@@ -129,6 +129,7 @@ interface AppStore {
   // Navigation
   currentStep: number
   unlockedSteps: number[]
+  language: 'en' | 'tr'
 
   // Step 1: Domain
   selectedDomainId: string | null
@@ -172,6 +173,7 @@ interface AppStore {
 
   // Actions
   setCurrentStep: (step: number) => void
+  setLanguage: (lang: 'en' | 'tr') => void
   selectDomain: (domainId: string) => void
   setDataSource: (source: 'builtin' | 'upload' | null) => void
   setRawData: (data: DataRow[], columns: ColumnInfo[], rowCount: number) => void
@@ -208,6 +210,7 @@ interface AppStore {
 const getInitialState = () => ({
   currentStep: 1,
   unlockedSteps: [1, 2, 7],
+  language: 'en' as 'en' | 'tr',
   selectedDomainId: null as string | null,
   dataSource: null as 'builtin' | 'upload' | null,
   rawData: [] as DataRow[],
@@ -251,6 +254,7 @@ export const useAppStore = create<AppStore>()((set, get) => ({
   ...getInitialState(),
 
   setCurrentStep: (step) => set({ currentStep: step }),
+  setLanguage: (lang) => set({ language: lang }),
 
   selectDomain: (domainId) => set({ selectedDomainId: domainId }),
 

@@ -34,9 +34,11 @@ import { Separator } from '@/components/ui/separator'
 import { Banner } from '@/components/shared/Banner'
 import { Progress } from '@/components/ui/progress'
 import { formatPercent, downloadBase64PDF } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n'
 import type { ChecklistItem } from '@/lib/types'
 
 export function Step7Ethics() {
+  const { t } = useTranslation()
   const {
     selectedDomainId,
     activeResults,
@@ -131,10 +133,10 @@ export function Step7Ethics() {
   // Mocked comparison data for Training Data Chart
   // In a production app, real population could come from local context / database.
   const trainingDataChart = [
-    { label: 'Male', training: 0.52, real: 0.49 },
-    { label: 'Female', training: 0.48, real: 0.51 },
-    { label: '18-60 yrs', training: 0.70, real: 0.45 },
-    { label: '61+ yrs', training: 0.30, real: 0.55 },
+    { label: t('steps.2.male'), training: 0.52, real: 0.49 },
+    { label: t('steps.2.female'), training: 0.48, real: 0.51 },
+    { label: `18-60 ${t('steps.2.years')}`, training: 0.70, real: 0.45 },
+    { label: `61+ ${t('steps.2.years')}`, training: 0.30, real: 0.55 },
   ]
   const hasRepresentationGap = trainingDataChart.some((d) => Math.abs(d.training - d.real) > 0.15)
 
@@ -143,13 +145,12 @@ export function Step7Ethics() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Badge variant="teal" size="sm">Step 7</Badge>
-          <span className="text-xs text-muted-foreground">Ethics & Bias</span>
+          <Badge variant="teal" size="sm">{t('common.step')} 7</Badge>
+          <span className="text-xs text-muted-foreground">{t('steps.7.label')}</span>
         </div>
-        <h1 className="step-heading">Ethics Review & Bias Audit</h1>
+        <h1 className="step-heading">{t('steps.7.heading')}</h1>
         <p className="step-subheading">
-          Evaluate fairness across patient subgroups and complete the responsible AI deployment
-          checklist.
+          {t('steps.7.subheading')}
         </p>
       </div>
 
@@ -161,14 +162,12 @@ export function Step7Ethics() {
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Scale className="h-4 w-4" />
-                  Subgroup Bias Analysis
+                  {t('steps.7.subgroupBias')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Subgroup analysis compares model performance across patient groups defined by:{' '}
-                  <strong>{domain.subgroupFields.join(', ')}</strong>. Differences in sensitivity
-                  or specificity &gt; 10 percentage points warrant careful review.
+                  {t('steps.7.biasIntro').replace('{fields}', domain.subgroupFields.join(', '))}
                 </p>
 
                 {!biasData && (
@@ -179,9 +178,9 @@ export function Step7Ethics() {
                     disabled={isAnalysingBias}
                   >
                     {isAnalysingBias ? (
-                      <><Loader2 className="h-4 w-4 animate-spin" /> Analysing...</>
+                      <><Loader2 className="h-4 w-4 animate-spin" /> {t('steps.7.analysing')}</>
                     ) : (
-                      <><Scale className="h-4 w-4" /> Run Bias Analysis</>
+                      <><Scale className="h-4 w-4" /> {t('steps.7.runAnalysis')}</>
                     )}
                   </Button>
                 )}
@@ -190,16 +189,16 @@ export function Step7Ethics() {
                   <>
                     {biasData.hasSignificantBias ? (
                       <Banner
-                        variant="danger" // changed to full-width red banner
-                        title="Significant Bias Detected"
-                        message="One or more subgroups show performance differences exceeding 10 percentage points. Review before clinical deployment."
+                        variant="danger"
+                        title={t('steps.7.biasDetectedTitle')}
+                        message={t('steps.7.biasDetectedMsg')}
                         className="w-full"
                       />
                     ) : (
                       <Banner
                         variant="success"
-                        title="No Significant Bias Detected"
-                        message="Subgroup performance is within acceptable thresholds (&lt;10pp difference). Continue to monitor in deployment."
+                        title={t('steps.7.noBiasTitle')}
+                        message={t('steps.7.noBiasMsg')}
                       />
                     )}
 
@@ -208,13 +207,13 @@ export function Step7Ethics() {
                         <p className="text-xl font-bold text-brand-navy">
                           {formatPercent(biasData.overallSensitivity)}
                         </p>
-                        <p className="text-xs text-muted-foreground">Overall Sensitivity</p>
+                        <p className="text-xs text-muted-foreground">{t('steps.7.overallSensitivity')}</p>
                       </div>
                       <div className="rounded-lg bg-surface p-3 text-center">
                         <p className="text-xl font-bold text-brand-navy">
                           {formatPercent(biasData.overallSpecificity)}
                         </p>
-                        <p className="text-xs text-muted-foreground">Overall Specificity</p>
+                        <p className="text-xs text-muted-foreground">{t('steps.7.overallSpecificity')}</p>
                       </div>
                     </div>
 
@@ -222,7 +221,15 @@ export function Step7Ethics() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border-subtle">
-                            {['Subgroup', 'Group', 'N', 'Sensitivity', 'Specificity', 'Δ Sensitivity', 'Fairness'].map((h) => (
+                            {[
+                              t('steps.7.subgroup'),
+                              t('steps.7.group'),
+                              t('steps.7.n'),
+                              t('steps.7.sensitivity'),
+                              t('steps.7.specificity'),
+                              t('steps.7.deltaSensitivity'),
+                              t('steps.7.fairness')
+                            ].map((h) => (
                               <th key={h} className="px-3 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 {h}
                               </th>
@@ -258,7 +265,7 @@ export function Step7Ethics() {
                       disabled={isAnalysingBias}
                     >
                       <RefreshCw className="h-3.5 w-3.5" />
-                      Re-run Analysis
+                      {t('steps.7.rerun')}
                     </Button>
                   </>
                 )}
@@ -268,7 +275,7 @@ export function Step7Ethics() {
             !activeResults && (
               <Banner
                 variant="info"
-                message="Train a model in Step 4 to run bias analysis."
+                message={t('steps.7.noModelMsg')}
                 className="mb-6"
               />
             )
@@ -281,19 +288,19 @@ export function Step7Ethics() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                Training Data Representation vs. Real Population
+                {t('steps.7.representationTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Comparing the demographics of the provided training dataset against target hospital population benchmarks.
+                {t('steps.7.representationDesc')}
               </p>
               
               {hasRepresentationGap && (
                 <Banner
                   variant="warning"
-                  title="Representation Gap Alert"
-                  message="Mismatches > 15 percentage points detected. The AI has had less opportunity to learn from under-represented groups."
+                  title={t('steps.7.gapAlertTitle')}
+                  message={t('steps.7.gapAlertMsg')}
                   className="mb-4"
                 />
               )}
@@ -305,8 +312,8 @@ export function Step7Ethics() {
                   <YAxis tickFormatter={(v) => formatPercent(v)} tick={{ fontSize: 12 }} domain={[0, 1]} />
                   <RechartsTooltip formatter={(value: number) => [formatPercent(value), '']} />
                   <Legend verticalAlign="top" height={36}/>
-                  <Bar dataKey="training" name="Training Data" fill="#0D9488" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="real" name="Real Population" fill="#64748B" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="training" name={t('steps.7.trainingData')} fill="#0D9488" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="real" name={t('steps.7.realPopulation')} fill="#64748B" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -319,32 +326,32 @@ export function Step7Ethics() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <BookOpen className="h-4 w-4"/>
-                Real-World AI Case Studies
+                {t('steps.7.caseStudiesTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 border border-clinical-danger/30 bg-clinical-danger/5 rounded-lg">
                 <h3 className="font-bold text-clinical-danger flex items-center gap-2 text-sm mb-2">
-                  <AlertTriangle className="h-4 w-4" /> Failure
+                  <AlertTriangle className="h-4 w-4" /> {t('steps.7.failure')}
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  A widely deployed algorithm systematically understated the health risks of Black patients. Because it used healthcare costs as a proxy for needs, it failed to reflect that Black patients often historically incurred lower costs due to unequal care access.
+                  {t('steps.7.failureMsg')}
                 </p>
               </div>
                <div className="p-4 border border-clinical-warning/30 bg-clinical-warning/5 rounded-lg">
                 <h3 className="font-bold text-clinical-warning flex items-center gap-2 text-sm mb-2">
-                  <AlertTriangle className="h-4 w-4" /> Near-Miss
+                  <AlertTriangle className="h-4 w-4" /> {t('steps.7.nearMiss')}
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  A sepsis prediction model consistently triggered false alarms for patients prescribed specific antibiotics. It had learned the drug meant the patient was high-risk, rather than predicting the risk early itself.
+                  {t('steps.7.nearMissMsg')}
                 </p>
               </div>
                <div className="p-4 border border-clinical-success/30 bg-clinical-success/5 rounded-lg">
                 <h3 className="font-bold text-clinical-success flex items-center gap-2 text-sm mb-2">
-                  <CheckCircle2 className="h-4 w-4" /> Prevention
+                  <CheckCircle2 className="h-4 w-4" /> {t('steps.7.prevention')}
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  A dermatology AI was found to perform poorly on darker skin tones during internal testing. It was sent back for retraining with a more diverse dataset across the Fitzpatrick scale, preventing misdiagnoses in practice.
+                  {t('steps.7.preventionMsg')}
                 </p>
               </div>
             </CardContent>
@@ -358,13 +365,13 @@ export function Step7Ethics() {
               <div className="flex items-start justify-between gap-4">
                 <CardTitle className="text-base flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4" />
-                  Responsible AI Deployment Checklist
+                  {t('steps.7.checklistTitle')}
                 </CardTitle>
                 <div className="text-right shrink-0">
                   <span className="text-sm font-bold text-brand-navy">
                     {checkedCount}/{totalCount}
                   </span>
-                  <p className="text-xs text-muted-foreground">completed</p>
+                  <p className="text-xs text-muted-foreground">{t('steps.7.completed')}</p>
                 </div>
               </div>
               <Progress value={checklistProgress} className="mt-3 h-2" />
@@ -390,15 +397,15 @@ export function Step7Ethics() {
                       htmlFor={`check-${item.id}`}
                       className="text-sm font-medium text-brand-navy cursor-pointer leading-tight"
                     >
-                      {item.label}
+                      {t(`steps.7.checklist.${item.id}.label`)}
                       {item.preChecked && (
                         <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-brand-teal">
-                          Auto
+                          {t('steps.7.auto')}
                         </span>
                       )}
                     </label>
                     <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                      {item.description}
+                      {t(`steps.7.checklist.${item.id}.desc`)}
                     </p>
                   </div>
                 </div>
@@ -409,7 +416,9 @@ export function Step7Ethics() {
               {checklistProgress < 100 && (
                 <Banner
                   variant="warning"
-                  message={`${totalCount - checkedCount} checklist item${totalCount - checkedCount !== 1 ? 's' : ''} remaining before this model should be considered for real-world deployment.`}
+                  message={t('steps.7.remainingMsg')
+                    .replace('{count}', (totalCount - checkedCount).toString())
+                    .replace('{plural}', totalCount - checkedCount !== 1 ? (t('common.pluralSuffix') || 's') : '')}
                   icon={false}
                 />
               )}
@@ -417,8 +426,8 @@ export function Step7Ethics() {
               {checklistProgress === 100 && (
                 <Banner
                   variant="success"
-                  title="Checklist Complete"
-                  message="All responsible AI deployment considerations have been addressed. You may now download your certificate."
+                  title={t('steps.7.checklistCompleteTitle')}
+                  message={t('steps.7.checklistCompleteMsg')}
                 />
               )}
             </CardContent>
@@ -437,7 +446,7 @@ export function Step7Ethics() {
             className="gap-3"
           >
             <Download className="h-5 w-5" />
-            Download Basic Certificate (PDF)
+            {t('steps.7.downloadBasic')}
           </Button>
           
           <Button
@@ -448,7 +457,7 @@ export function Step7Ethics() {
             className="gap-3 border-brand-teal text-brand-teal bg-transparent hover:bg-brand-teal hover:text-white transition-colors"
           >
             <Download className="h-5 w-5" />
-            Download Detailed Report (PDF)
+            {t('steps.7.downloadDetailed')}
           </Button>
         </div>
       )}
@@ -456,11 +465,10 @@ export function Step7Ethics() {
       {/* End of journey */}
       <div className="mt-8 text-center text-xs text-muted-foreground">
         <p>
-          HEALTH-AI · ML Learning Tool · Erasmus+ KA220-HED
+          {t('steps.7.footer')}
         </p>
         <p className="mt-1">
-          For educational purposes only. All datasets are synthetic and do not contain real patient
-          data.
+          {t('steps.7.educational')}
         </p>
       </div>
     </div>

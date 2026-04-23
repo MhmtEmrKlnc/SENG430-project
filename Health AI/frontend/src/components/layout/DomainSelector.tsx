@@ -15,20 +15,23 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-
-// Group domains by specialty area for organised display
-const SPECIALTY_GROUPS: Record<string, string[]> = {
-  'Cardiology & Vascular': ['cardiology', 'arrhythmia', 'stroke'],
-  'Oncology': ['breast_cancer', 'cervical_cancer'],
-  'Organ Systems': ['nephrology', 'liver', 'thyroid', 'ophthalmology'],
-  'Neurology & Mental Health': ['parkinsons', 'mental_health'],
-  'Respiratory & Critical Care': ['pulmonology', 'sepsis'],
-  'Endocrinology & Metabolic': ['diabetes', 'readmission'],
-  'Haematology': ['haematology', 'haematology_advanced'],
-  'Obstetrics, Orthopaedics & Dermatology': ['fetal_health', 'orthopaedics', 'dermatology'],
-}
+import { useTranslation } from '@/lib/i18n'
 
 export function DomainSelector() {
+  const { t } = useTranslation()
+  
+  // Group domains by specialty area for organised display
+  const SPECIALTY_GROUPS: Record<string, string[]> = {
+    [t('domainSelector.groups.cardiology')]: ['cardiology', 'arrhythmia', 'stroke'],
+    [t('domainSelector.groups.oncology')]: ['breast_cancer', 'cervical_cancer'],
+    [t('domainSelector.groups.organ_systems')]: ['nephrology', 'liver', 'thyroid', 'ophthalmology'],
+    [t('domainSelector.groups.neurology')]: ['parkinsons', 'mental_health'],
+    [t('domainSelector.groups.respiratory')]: ['pulmonology', 'sepsis'],
+    [t('domainSelector.groups.metabolic')]: ['diabetes', 'readmission'],
+    [t('domainSelector.groups.haematology')]: ['haematology', 'haematology_advanced'],
+    [t('domainSelector.groups.others')]: ['fetal_health', 'orthopaedics', 'dermatology'],
+  }
+
   const { selectedDomainId, columnMapping, selectDomain, resetAll, setCurrentStep } = useAppStore()
   const [open, setOpen] = React.useState(false)
   const [confirmOpen, setConfirmOpen] = React.useState(false)
@@ -89,7 +92,7 @@ export function DomainSelector() {
       >
         <Stethoscope className="h-3.5 w-3.5" />
         <span className="max-w-[140px] truncate sm:max-w-[200px]">
-          {currentDomain ? currentDomain.label : 'Select Specialty'}
+          {currentDomain ? currentDomain.label : t('domainSelector.label')}
         </span>
         <ChevronDown className="h-3 w-3 opacity-60" />
       </button>
@@ -98,10 +101,9 @@ export function DomainSelector() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Select Clinical Specialty</DialogTitle>
+            <DialogTitle>{t('domainSelector.title')}</DialogTitle>
             <DialogDescription>
-              Choose a medical domain to explore. Each specialty uses a different dataset and
-              clinical question.
+              {t('domainSelector.description')}
             </DialogDescription>
           </DialogHeader>
 
@@ -139,7 +141,7 @@ export function DomainSelector() {
                             </span>
                             {domain.id === selectedDomainId && (
                               <Badge variant="teal" size="sm">
-                                Active
+                                {t('domainSelector.active')}
                               </Badge>
                             )}
                           </div>
@@ -149,14 +151,14 @@ export function DomainSelector() {
                         </div>
                         <div className="text-right shrink-0 mt-0.5">
                           <span className="text-xs text-muted-foreground whitespace-nowrap">
-                            ~{domain.estimatedMinutes} min
+                            ~{domain.estimatedMinutes} {t('domainSelector.minutes')}
                           </span>
                           <Badge
                             variant={domain.taskType === 'binary' ? 'light' : 'info'}
                             size="sm"
                             className="ml-1"
                           >
-                            {domain.taskType === 'binary' ? 'Binary' : 'Multiclass'}
+                            {domain.taskType === 'binary' ? t('steps.2.binary') : t('steps.2.multiclass')}
                           </Badge>
                         </div>
                       </button>
@@ -175,21 +177,18 @@ export function DomainSelector() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-clinical-warning" />
-              Switch Specialty?
+              {t('domainSelector.confirmTitle')}
             </DialogTitle>
             <DialogDescription>
-              Switching to{' '}
-              <strong className="text-foreground">{pendingDomain?.label}</strong> will reset
-              your current progress — including data settings, trained models, and results. This
-              cannot be undone.
+              {t('domainSelector.confirmDescription').replace('{domain}', pendingDomain?.label || '')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={handleCancelSwitch}>
-              Keep Current
+              {t('domainSelector.keepCurrent')}
             </Button>
             <Button variant="destructive" onClick={handleConfirmSwitch}>
-              Switch & Reset
+              {t('domainSelector.switchReset')}
             </Button>
           </DialogFooter>
         </DialogContent>

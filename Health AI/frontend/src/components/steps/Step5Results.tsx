@@ -21,6 +21,7 @@ import {
 } from 'recharts'
 import { useAppStore } from '@/lib/store'
 import { getDomainById } from '@/lib/domains'
+import { useTranslation } from '@/lib/i18n'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -29,40 +30,10 @@ import { Banner } from '@/components/shared/Banner'
 import { getMetricStatus, formatPercent, getModelLabel } from '@/lib/utils'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
-const METRIC_DESCRIPTIONS: Record<
-  string,
-  { description: string; concern: string }
-> = {
-  accuracy: {
-    description: 'Proportion of all predictions that are correct.',
-    concern: 'Can be misleading with imbalanced datasets — a model predicting "no disease" always may score high.',
-  },
-  sensitivity: {
-    description:
-      'Proportion of actual positive cases correctly identified (True Positive Rate).',
-    concern:
-      'Low sensitivity means the model misses real cases — dangerous in clinical screening.',
-  },
-  specificity: {
-    description: 'Proportion of actual negative cases correctly identified.',
-    concern:
-      'Low specificity means too many false alarms, wasting clinical resource.',
-  },
-  precision: {
-    description: 'Of all predicted positives, the proportion that are actually positive.',
-    concern: 'Low precision means many false alarms.',
-  },
-  f1: {
-    description: 'Harmonic mean of Precision and Sensitivity.',
-    concern: 'Below 0.7 suggests the model struggles to balance misses and false alarms.',
-  },
-  auc: {
-    description: 'Ability to distinguish positive from negative across all thresholds.',
-    concern: 'Below 0.7 is only marginally better than chance.',
-  },
-}
+// Removed METRIC_DESCRIPTIONS here as it is now in locale files
 
 export function Step5Results() {
+  const { t } = useTranslation()
   const {
     selectedDomainId,
     activeResults,
@@ -76,8 +47,8 @@ export function Step5Results() {
       <div className="step-container">
         <Banner
           variant="warning"
-          title="No model trained"
-          message="Train a model in Step 4 to view results here."
+          title={t('steps.5.noModelTitle')}
+          message={t('steps.5.noModelMsg')}
         />
       </div>
     )
@@ -101,12 +72,12 @@ export function Step5Results() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Badge variant="teal" size="sm">Step 5</Badge>
-          <span className="text-xs text-muted-foreground">Results</span>
+          <Badge variant="teal" size="sm">{t('common.step')} 5</Badge>
+          <span className="text-xs text-muted-foreground">{t('steps.5.label')}</span>
         </div>
-        <h1 className="step-heading">Model Results</h1>
+        <h1 className="step-heading">{t('steps.5.heading')}</h1>
         <p className="step-subheading">
-          {getModelLabel(modelType)} · Evaluate performance on the held-out test set.
+          {t('steps.5.subheading').replace('{model}', getModelLabel(modelType))}
         </p>
       </div>
 
@@ -114,7 +85,7 @@ export function Step5Results() {
       {domain?.clinicalSenseCheck && (
         <Banner
           variant="info"
-          title="Clinical Sense Check"
+          title={t('steps.5.clinicalSenseCheck')}
           message={domain.clinicalSenseCheck}
           className="mb-6"
         />
@@ -124,8 +95,8 @@ export function Step5Results() {
       {metrics.sensitivity < 0.5 && (
         <Banner
           variant="error"
-          title="Danger: Low Sensitivity Alert (< 50%)"
-          message={`This model only identifies ${formatPercent(metrics.sensitivity)} of positive cases. Because it misses the majority of real cases, this configuration is extremely unsafe for clinical screening!`}
+          title={t('steps.5.lowSensitivityTitle')}
+          message={t('steps.5.lowSensitivityMsg').replace('{percent}', formatPercent(metrics.sensitivity))}
           className="mb-6"
         />
       )}
@@ -144,10 +115,10 @@ export function Step5Results() {
         ).map(([key, emphasized]) => (
           <MetricCard
             key={key}
-            label={key.charAt(0).toUpperCase() + key.slice(1)}
+            label={t(`steps.5.metrics.${key}.label`)}
             value={metrics[key as keyof typeof metrics]}
-            description={METRIC_DESCRIPTIONS[key].description}
-            concern={METRIC_DESCRIPTIONS[key].concern}
+            description={t(`steps.5.metrics.${key}.desc`)}
+            concern={t(`steps.5.metrics.${key}.concern`)}
             status={getMetricStatus(key, metrics[key as keyof typeof metrics])}
             emphasized={emphasized}
           />
@@ -157,19 +128,19 @@ export function Step5Results() {
       {/* Tabs: Confusion Matrix, ROC Curve, Feature Importance */}
       <Tabs defaultValue="confusion">
         <TabsList className="mb-4">
-          <TabsTrigger value="confusion">Confusion Matrix</TabsTrigger>
-          <TabsTrigger value="roc">ROC Curve</TabsTrigger>
-          <TabsTrigger value="features">Feature Importance</TabsTrigger>
+          <TabsTrigger value="confusion">{t('steps.5.confusionMatrix')}</TabsTrigger>
+          <TabsTrigger value="roc">{t('steps.5.rocCurve')}</TabsTrigger>
+          <TabsTrigger value="features">{t('steps.5.featureImportance')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="confusion">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Confusion Matrix</CardTitle>
+              <CardTitle className="text-base">{t('steps.5.confusionMatrix')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center gap-4">
-                <div className="text-xs text-muted-foreground">Predicted →</div>
+                <div className="text-xs text-muted-foreground">{t('steps.5.predicted')} →</div>
                 <div className="overflow-x-auto">
                   <table className="border-collapse text-center">
                     <thead>
@@ -181,7 +152,7 @@ export function Step5Results() {
                               key={label}
                               className="p-3 text-xs font-semibold text-brand-navy bg-surface border border-border-subtle"
                             >
-                              Predicted<br />{label}
+                              {t('steps.5.predicted')}<br />{label}
                             </th>
                           )
                         )}
@@ -194,7 +165,7 @@ export function Step5Results() {
                         return (
                           <tr key={ri}>
                             <th className="p-3 text-xs font-semibold text-brand-navy bg-surface border border-border-subtle whitespace-nowrap">
-                              Actual<br />{actualLabel}
+                              {t('steps.5.actual')}<br />{actualLabel}
                             </th>
                             {row.map((val, ci) => {
                               const isDiagonal = ri === ci
@@ -218,8 +189,7 @@ export function Step5Results() {
                   </table>
                 </div>
                 <p className="text-xs text-muted-foreground text-center max-w-md">
-                  Green diagonal cells = correct predictions. Red off-diagonal = errors.
-                  Higher diagonal values indicate better model performance.
+                  {t('steps.5.matrixDesc')}
                 </p>
               </div>
             </CardContent>
@@ -231,33 +201,33 @@ export function Step5Results() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
-                ROC Curve · AUC = {formatPercent(metrics.auc)}
+                {t('steps.5.aucTitle').replace('{auc}', formatPercent(metrics.auc))}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={rocData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-                  <XAxis
-                    dataKey="fpr"
-                    label={{ value: 'False Positive Rate', position: 'insideBottom', offset: -5 }}
-                    tickFormatter={(v) => `${Math.round(v * 100)}%`}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <YAxis
-                    label={{
-                      value: 'True Positive Rate',
-                      angle: -90,
-                      position: 'insideLeft',
-                      offset: 10,
-                    }}
-                    tickFormatter={(v) => `${Math.round(v * 100)}%`}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <RechartsTooltip
-                    formatter={(value: number) => [formatPercent(value), '']}
-                    labelFormatter={(v) => `FPR: ${formatPercent(Number(v))}`}
-                  />
+                    <XAxis
+                      dataKey="fpr"
+                      label={{ value: t('steps.5.fpr'), position: 'insideBottom', offset: -5 }}
+                      tickFormatter={(v) => `${Math.round(v * 100)}%`}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <YAxis
+                      label={{
+                        value: t('steps.5.tpr'),
+                        angle: -90,
+                        position: 'insideLeft',
+                        offset: 10,
+                      }}
+                      tickFormatter={(v) => `${Math.round(v * 100)}%`}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <RechartsTooltip
+                      formatter={(value: number) => [formatPercent(value), '']}
+                      labelFormatter={(v) => `${t('steps.5.fpr')}: ${formatPercent(Number(v))}`}
+                    />
                   <ReferenceLine
                     x={0}
                     y={0}
@@ -284,13 +254,13 @@ export function Step5Results() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <BarChart2 className="h-4 w-4" />
-                Feature Importance (Top 10)
+                {t('steps.5.top10Features')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {topFeatures.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  Feature importance is not available for this model type.
+                  {t('steps.5.noFeatures')}
                 </p>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
@@ -312,7 +282,7 @@ export function Step5Results() {
                       width={115}
                     />
                     <RechartsTooltip
-                      formatter={(value: number) => [value.toFixed(4), 'Importance']}
+                      formatter={(value: number) => [value.toFixed(4), t('steps.5.featureImportance')]}
                     />
                     <Bar dataKey="importance" radius={[0, 4, 4, 0]}>
                       {topFeatures.map((_, i) => (
@@ -333,7 +303,7 @@ export function Step5Results() {
       {/* Navigation */}
       <div className="flex justify-end mt-6">
         <Button variant="teal" size="lg" onClick={() => setCurrentStep(6)}>
-          Explore Explainability
+          {t('steps.5.continue')}
           <ChevronRight className="h-5 w-5" />
         </Button>
       </div>

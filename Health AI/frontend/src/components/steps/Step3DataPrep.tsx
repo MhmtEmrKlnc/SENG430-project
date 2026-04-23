@@ -5,6 +5,7 @@ import { Settings2, Loader2, CheckCircle2, ChevronRight } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
 import { getDomainById } from '@/lib/domains'
 import { preprocessData } from '@/lib/api'
+import { useTranslation } from '@/lib/i18n'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,6 +24,7 @@ import { Separator } from '@/components/ui/separator'
 import { formatPercent } from '@/lib/utils'
 
 export function Step3DataPrep() {
+  const { t } = useTranslation()
   const {
     selectedDomainId,
     columnMapping,
@@ -54,7 +56,7 @@ export function Step3DataPrep() {
       })
       setProcessedDataset(result)
     } catch (err) {
-      setPrepError(err instanceof Error ? err.message : 'Preprocessing failed.')
+      setPrepError(err instanceof Error ? err.message : t('steps.3.running'))
     } finally {
       setIsPreparing(false)
     }
@@ -72,20 +74,20 @@ export function Step3DataPrep() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Badge variant="teal" size="sm">Step 3</Badge>
-          <span className="text-xs text-muted-foreground">Data Preparation</span>
+          <Badge variant="teal" size="sm">{t('common.step')} 3</Badge>
+          <span className="text-xs text-muted-foreground">{t('steps.3.label')}</span>
         </div>
-        <h1 className="step-heading">Prepare the Data</h1>
+        <h1 className="step-heading">{t('steps.3.heading')}</h1>
         <p className="step-subheading">
-          Configure how missing values are handled, how features are scaled, and the train/test split.
+          {t('steps.3.subheading')}
         </p>
       </div>
 
       {!columnMapping && (
         <Banner
           variant="warning"
-          title="Column mapping required"
-          message="Return to Step 2 to select your target and feature columns before preprocessing."
+          title={t('steps.3.mappingRequiredTitle')}
+          message={t('steps.3.mappingRequiredMsg')}
         />
       )}
 
@@ -98,12 +100,12 @@ export function Step3DataPrep() {
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Settings2 className="h-4 w-4" />
-                  Train / Test Split
+                  {t('steps.3.splitTitle')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Test set size</span>
+                  <span className="text-muted-foreground">{t('steps.3.testSetSize')}</span>
                   <span className="font-semibold text-brand-navy">
                     {formatPercent(prepSettings.testSize)}
                   </span>
@@ -120,13 +122,13 @@ export function Step3DataPrep() {
                     <p className="text-xl font-bold text-brand-navy">
                       {formatPercent(1 - prepSettings.testSize)}
                     </p>
-                    <p className="text-xs text-muted-foreground">Training ({trainCount} rows)</p>
+                    <p className="text-xs text-muted-foreground">{t('steps.3.trainingRows')} ({trainCount} {t('steps.2.rows').toLowerCase()})</p>
                   </div>
                   <div className="rounded-lg bg-brand-blue/5 p-3">
                     <p className="text-xl font-bold text-brand-blue">
                       {formatPercent(prepSettings.testSize)}
                     </p>
-                    <p className="text-xs text-muted-foreground">Testing ({testCount} rows)</p>
+                    <p className="text-xs text-muted-foreground">{t('steps.3.testingRows')} ({testCount} {t('steps.2.rows').toLowerCase()})</p>
                   </div>
                 </div>
               </CardContent>
@@ -135,7 +137,7 @@ export function Step3DataPrep() {
             {/* Missing values */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Missing Value Strategy</CardTitle>
+                <CardTitle className="text-base">{t('steps.3.missingStrategyTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Select
@@ -149,17 +151,16 @@ export function Step3DataPrep() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="median">
-                      Impute with Median (recommended for numeric)
+                      {t('steps.3.imputeMedian')}
                     </SelectItem>
                     <SelectItem value="mode">
-                      Impute with Mode (recommended for categorical)
+                      {t('steps.3.imputeMode')}
                     </SelectItem>
-                    <SelectItem value="remove">Remove Rows with Missing Values</SelectItem>
+                    <SelectItem value="remove">{t('steps.3.removeRows')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Median imputation is robust to outliers and suitable for most clinical numeric
-                  variables.
+                  {t('steps.3.medianDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -167,7 +168,7 @@ export function Step3DataPrep() {
             {/* Normalisation */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Feature Normalisation</CardTitle>
+                <CardTitle className="text-base">{t('steps.3.normTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Select
@@ -180,13 +181,13 @@ export function Step3DataPrep() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="zscore">Z-Score Standardisation (mean=0, std=1)</SelectItem>
-                    <SelectItem value="minmax">Min-Max Scaling (0 to 1)</SelectItem>
-                    <SelectItem value="none">No Normalisation</SelectItem>
+                    <SelectItem value="zscore">{t('steps.3.zscore')}</SelectItem>
+                    <SelectItem value="minmax">{t('steps.3.minmax')}</SelectItem>
+                    <SelectItem value="none">{t('steps.3.none')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Required for KNN, SVM, and Logistic Regression. Not needed for tree-based models.
+                  {t('steps.3.normDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -194,15 +195,14 @@ export function Step3DataPrep() {
             {/* SMOTE */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Class Imbalance (SMOTE)</CardTitle>
+                <CardTitle className="text-base">{t('steps.3.imbalanceTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Apply SMOTE</Label>
+                    <Label>{t('steps.3.applySmote')}</Label>
                     <p className="text-xs text-muted-foreground max-w-[220px]">
-                      Oversample the minority class using synthetic examples. Useful when &lt;30%
-                      of cases are positive.
+                      {t('steps.3.smoteDesc')}
                     </p>
                   </div>
                   <Switch
@@ -218,16 +218,16 @@ export function Step3DataPrep() {
           <div className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Configuration Summary</CardTitle>
+                <CardTitle className="text-base">{t('steps.3.summaryTitle')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 {[
-                  { label: 'Features', value: `${columnMapping.featureColumns.length} columns` },
-                  { label: 'Target', value: columnMapping.targetColumn },
-                  { label: 'Test Split', value: formatPercent(prepSettings.testSize) },
-                  { label: 'Missing Strategy', value: prepSettings.missingStrategy },
-                  { label: 'Normalisation', value: prepSettings.normalizeMethod },
-                  { label: 'SMOTE', value: prepSettings.applySmote ? 'Yes' : 'No' },
+                  { label: t('steps.3.features'), value: `${columnMapping.featureColumns.length} ${t('steps.2.columns').toLowerCase()}` },
+                  { label: t('steps.3.target'), value: columnMapping.targetColumn },
+                  { label: t('steps.3.testSplit'), value: formatPercent(prepSettings.testSize) },
+                  { label: t('steps.3.missingStrategyTitle'), value: t(`steps.3.impute${prepSettings.missingStrategy.charAt(0).toUpperCase()}${prepSettings.missingStrategy.slice(1)}`) },
+                  { label: t('steps.3.normTitle'), value: t(`steps.3.${prepSettings.normalizeMethod}`) },
+                  { label: 'SMOTE', value: prepSettings.applySmote ? t('steps.3.yes') : t('steps.3.no') },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex justify-between py-1 border-b border-border-subtle last:border-0">
                     <span className="text-muted-foreground">{label}</span>
@@ -238,14 +238,14 @@ export function Step3DataPrep() {
             </Card>
 
             {prepError && (
-              <Banner variant="error" title="Preprocessing Failed" message={prepError} />
+              <Banner variant="error" title={t('steps.3.prepFailed')} message={prepError} />
             )}
 
             {processedDataset && (
               <Banner
                 variant="success"
-                title="Preprocessing Complete"
-                message={`Dataset split into ${processedDataset.nTrain} training and ${processedDataset.nTest} test samples. Step 4 is now unlocked.`}
+                title={t('steps.3.prepComplete')}
+                message={t('steps.3.prepCompleteMsg').replace('{train}', processedDataset.nTrain.toString()).replace('{test}', processedDataset.nTest.toString())}
               />
             )}
 
@@ -258,15 +258,15 @@ export function Step3DataPrep() {
               disabled={isPreparing}
             >
               {isPreparing ? (
-                'Preprocessing...'
+                t('steps.3.running')
               ) : processedDataset ? (
                 <>
                   <CheckCircle2 className="h-4 w-4" />
-                  Re-run Preprocessing
+                  {t('steps.3.rerun')}
                 </>
               ) : (
                 <>
-                  Run Preprocessing
+                  {t('steps.3.run')}
                   <ChevronRight className="h-4 w-4" />
                 </>
               )}
@@ -278,7 +278,7 @@ export function Step3DataPrep() {
                 className="w-full"
                 onClick={() => setCurrentStep(4)}
               >
-                Continue to Model Training
+                {t('steps.3.continue')}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             )}

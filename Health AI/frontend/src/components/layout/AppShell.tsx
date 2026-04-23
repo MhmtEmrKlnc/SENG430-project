@@ -7,6 +7,7 @@ import { Navbar } from './Navbar'
 import { Stepper } from './Stepper'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n'
 
 // Lazy-load step components to keep initial bundle small
 const StepComponents = {
@@ -21,17 +22,10 @@ const StepComponents = {
 
 type StepNumber = keyof typeof StepComponents
 
-const STEP_LABELS: Record<StepNumber, string> = {
-  1: 'Clinical Context',
-  2: 'Data Exploration',
-  3: 'Data Preparation',
-  4: 'Model & Training',
-  5: 'Results',
-  6: 'Explainability',
-  7: 'Ethics & Bias',
-}
+
 
 function StepLoadingFallback() {
+  const { t } = useTranslation()
   return (
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="flex flex-col items-center gap-3 text-muted-foreground">
@@ -44,21 +38,17 @@ function StepLoadingFallback() {
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
-        <span className="text-sm">Loading step...</span>
+        <span className="text-sm">{t('common.loadingStep')}</span>
       </div>
     </div>
   )
 }
 
 function LockedStepPlaceholder({ stepNumber }: { stepNumber: number }) {
-  const stepLabel = STEP_LABELS[stepNumber as StepNumber] ?? `Step ${stepNumber}`
+  const { t } = useTranslation()
+  const stepLabel = t(`steps.${stepNumber as StepNumber}.label`) ?? `Step ${stepNumber}`
 
-  const lockMessages: Record<number, string> = {
-    3: 'Complete Data Exploration (Step 2) and select your target and feature columns to unlock Data Preparation.',
-    4: 'Complete Data Preparation (Step 3) to unlock Model & Training.',
-    5: 'Train at least one model in Step 4 to unlock Results.',
-    6: 'View results in Step 5 and select an active model to unlock Explainability.',
-  }
+  const lockMessage = t(`lockedMessages.${stepNumber}`) ?? t('common.completePrevious')
 
   return (
     <div className="flex items-center justify-center min-h-[400px]">
@@ -67,11 +57,10 @@ function LockedStepPlaceholder({ stepNumber }: { stepNumber: number }) {
           <Lock className="h-7 w-7 text-muted-foreground" />
         </div>
         <h2 className="text-xl font-semibold text-brand-navy mb-2">
-          {stepLabel} Locked
+          {stepLabel} {t('common.locked')}
         </h2>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          {lockMessages[stepNumber] ??
-            'Complete the previous steps to unlock this section.'}
+          {lockMessage}
         </p>
       </div>
     </div>
@@ -79,6 +68,7 @@ function LockedStepPlaceholder({ stepNumber }: { stepNumber: number }) {
 }
 
 export function AppShell() {
+  const { t } = useTranslation()
   const { currentStep, unlockedSteps, setCurrentStep } = useAppStore()
   const unlockedSet = new Set(unlockedSteps)
 
@@ -140,16 +130,16 @@ export function AppShell() {
               className={cn(!canGoPrev && 'invisible')}
             >
               <ChevronLeft className="h-4 w-4" />
-              <span>Previous</span>
+              <span>{t('common.previous')}</span>
             </Button>
 
             {/* Step indicator */}
             <div className="text-center">
               <span className="text-xs text-muted-foreground">
-                Step {currentStep} of 7
+                {t('common.step')} {currentStep} {t('common.of')} 7
               </span>
               <p className="text-sm font-medium text-brand-navy hidden sm:block">
-                {STEP_LABELS[currentStep as StepNumber]}
+                {t(`steps.${currentStep as StepNumber}.label`)}
               </p>
             </div>
 
@@ -160,9 +150,9 @@ export function AppShell() {
                 onClick={handleNext}
                 disabled={!canGoNext}
                 className={cn(!canGoNext && 'opacity-50')}
-                title={!canGoNext ? 'Complete this step to continue' : undefined}
+                title={!canGoNext ? t('common.completePrevious') : undefined}
               >
-                <span>Next</span>
+                <span>{t('common.next')}</span>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             ) : (

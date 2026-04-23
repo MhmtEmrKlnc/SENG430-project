@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Cpu, Play, ChevronRight, CheckCircle2, Plus } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
 import { trainModel } from '@/lib/api'
+import { useTranslation } from '@/lib/i18n'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +13,11 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { KNNVisualisation } from './KNNVisualisation'
+import { SVMVisualisation } from './SVMVisualisation'
+import { DecisionTreeVisualisation } from './DecisionTreeVisualisation'
+import { RandomForestVisualisation } from './RandomForestVisualisation'
+import { LogisticRegressionVisualisation } from './LogisticRegressionVisualisation'
+import { NaiveBayesVisualisation } from './NaiveBayesVisualisation'
 import {
   Select,
   SelectContent,
@@ -23,36 +29,36 @@ import { Banner } from '@/components/shared/Banner'
 import { getModelLabel, generateId, formatPercent } from '@/lib/utils'
 import type { ModelType } from '@/lib/types'
 
-const MODEL_OPTIONS: { value: ModelType; label: string; description: string }[] = [
+const getModelOptions = (t: any): { value: ModelType; label: string; description: string }[] => [
   {
     value: 'knn',
     label: 'K-Nearest Neighbours',
-    description: 'Classifies based on similarity to nearby training examples.',
+    description: t('steps.4.algo.knn.desc'),
   },
   {
     value: 'logistic_regression',
     label: 'Logistic Regression',
-    description: 'Estimates probability of an outcome using a linear boundary.',
+    description: t('steps.4.algo.lr.desc'),
   },
   {
     value: 'decision_tree',
     label: 'Decision Tree',
-    description: 'Builds a tree of if/then rules from the data.',
+    description: t('steps.4.algo.dt.desc'),
   },
   {
     value: 'random_forest',
     label: 'Random Forest',
-    description: 'Combines many decision trees for more robust predictions.',
+    description: t('steps.4.algo.rf.desc'),
   },
   {
     value: 'svm',
     label: 'Support Vector Machine',
-    description: 'Finds the optimal boundary between classes.',
+    description: t('steps.4.algo.svm.desc'),
   },
   {
     value: 'naive_bayes',
     label: 'Naïve Bayes',
-    description: 'Applies Bayes theorem with feature independence assumption.',
+    description: t('steps.4.algo.nb.desc'),
   },
 ]
 
@@ -72,6 +78,8 @@ const ParamLabel = ({ label, tooltip }: { label: string; tooltip: string }) => (
 )
 
 export function Step4ModelTraining() {
+  const { t } = useTranslation()
+  const MODEL_OPTIONS = getModelOptions(t)
   const {
     processedDataset,
     selectedModel,
@@ -105,7 +113,7 @@ export function Step4ModelTraining() {
       setTrainedModel(selectedModel, result)
       setActiveResults(result)
     } catch (err) {
-      setTrainingError(err instanceof Error ? err.message : 'Training failed.')
+      setTrainingError(err instanceof Error ? err.message : t('steps.4.training'))
     } finally {
       setIsTraining(false)
     }
@@ -139,8 +147,8 @@ export function Step4ModelTraining() {
       <div className="step-container">
         <Banner
           variant="warning"
-          title="Data not prepared"
-          message="Complete Step 3 (Data Preparation) before training a model."
+          title={t('steps.4.notPreparedTitle')}
+          message={t('steps.4.notPreparedMsg')}
         />
       </div>
     )
@@ -150,12 +158,12 @@ export function Step4ModelTraining() {
     <div className="step-container">
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Badge variant="teal" size="sm">Step 4</Badge>
-          <span className="text-xs text-muted-foreground">Model & Training</span>
+          <Badge variant="teal" size="sm">{t('common.step')} 4</Badge>
+          <span className="text-xs text-muted-foreground">{t('steps.4.label')}</span>
         </div>
-        <h1 className="step-heading">Select & Train a Model</h1>
+        <h1 className="step-heading">{t('steps.4.heading')}</h1>
         <p className="step-subheading">
-          Choose an algorithm, tune its hyperparameters, and train on the prepared dataset.
+          {t('steps.4.subheading')}
         </p>
       </div>
 
@@ -164,7 +172,7 @@ export function Step4ModelTraining() {
         <div className="lg:col-span-1 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Choose Algorithm</CardTitle>
+              <CardTitle className="text-base">{t('steps.4.chooseAlgorithm')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 p-3">
               {MODEL_OPTIONS.map((opt) => {
@@ -201,10 +209,10 @@ export function Step4ModelTraining() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Cpu className="h-4 w-4" />
-                Hyperparameters — {getModelLabel(selectedModel)}
+                {t('steps.4.hyperparameters')} — {getModelLabel(selectedModel)}
               </CardTitle>
               <div className="flex items-center space-x-2">
-                <Label htmlFor="auto-retrain" className="text-xs font-normal text-muted-foreground mr-1">Auto-Retrain</Label>
+                <Label htmlFor="auto-retrain" className="text-xs font-normal text-muted-foreground mr-1">{t('steps.4.autoRetrain')}</Label>
                 <Switch 
                   id="auto-retrain" 
                   checked={autoRetrain} 
@@ -218,7 +226,7 @@ export function Step4ModelTraining() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <ParamLabel label="K (neighbours)" tooltip="How many similar historical patient cases to review when classifying a new patient." />
+                        <ParamLabel label={t('steps.4.hp.knn.k')} tooltip={t('steps.4.hp.knn.k_tip')} />
                         <span className="font-semibold">{(hp as { k: number }).k}</span>
                       </div>
                       <Slider
@@ -228,15 +236,15 @@ export function Step4ModelTraining() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <ParamLabel label="Distance Metric" tooltip="The mathematical formula used to measure similarity between patients (e.g. straight-line vs block distance)." />
+                      <ParamLabel label={t('steps.4.hp.knn.distance')} tooltip={t('steps.4.hp.knn.distance_tip')} />
                       <Select
                         value={(hp as { distance: string }).distance}
                         onValueChange={(v) => updateHyperparam('knn', 'distance', v)}
                       >
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="euclidean">Euclidean</SelectItem>
-                          <SelectItem value="manhattan">Manhattan</SelectItem>
+                          <SelectItem value="euclidean">{t('steps.4.hp.knn.euclidean')}</SelectItem>
+                          <SelectItem value="manhattan">{t('steps.4.hp.knn.manhattan')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -248,113 +256,141 @@ export function Step4ModelTraining() {
               )}
 
               {selectedModel === 'svm' && (
-                <>
-                  <div className="space-y-2">
-                    <ParamLabel label="Kernel" tooltip="The mathematical function used to transform patient data into higher dimensions to establish a clear separation boundary." />
-                    <Select
-                      value={(hp as { kernel: string }).kernel}
-                      onValueChange={(v) => updateHyperparam('svm', 'kernel', v)}
-                    >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="rbf">RBF (non-linear)</SelectItem>
-                        <SelectItem value="linear">Linear</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <ParamLabel label="Regularisation (C)" tooltip="Controls the trade-off. Lower C prefers a smoother boundary. Higher C tries to perfectly classify all training points but risks overfitting." />
-                      <span className="font-semibold">{(hp as { C: number }).C}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <ParamLabel label={t('steps.4.hp.svm.kernel')} tooltip={t('steps.4.hp.svm.kernel_tip')} />
+                      <Select
+                        value={(hp as { kernel: string }).kernel}
+                        onValueChange={(v) => updateHyperparam('svm', 'kernel', v)}
+                      >
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="rbf">{t('steps.4.hp.svm.rbf')}</SelectItem>
+                          <SelectItem value="linear">{t('steps.4.hp.svm.linear')}</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Slider
-                      min={1} max={100} step={1}
-                      value={[(hp as { C: number }).C]}
-                      onValueChange={([v]) => updateHyperparam('svm', 'C', v)}
-                    />
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <ParamLabel label={t('steps.4.hp.svm.c')} tooltip={t('steps.4.hp.svm.c_tip')} />
+                        <span className="font-semibold">{(hp as { C: number }).C}</span>
+                      </div>
+                      <Slider
+                        min={1} max={100} step={1}
+                        value={[(hp as { C: number }).C]}
+                        onValueChange={([v]) => updateHyperparam('svm', 'C', v)}
+                      />
+                    </div>
                   </div>
-                </>
+                  <div className="flex justify-center items-center pt-4">
+                    <SVMVisualisation kernel={(hp as { kernel: string }).kernel} C={(hp as { C: number }).C} />
+                  </div>
+                </div>
               )}
 
               {selectedModel === 'decision_tree' && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <ParamLabel label="Max Depth" tooltip="The maximum number of sequential questions (splits) the tree can ask. Too deep risks memorizing patient noise." />
-                    <span className="font-semibold">{(hp as { maxDepth: number }).maxDepth}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <ParamLabel label={t('steps.4.hp.dt.maxDepth')} tooltip={t('steps.4.hp.dt.maxDepth_tip')} />
+                        <span className="font-semibold">{(hp as { maxDepth: number }).maxDepth}</span>
+                      </div>
+                      <Slider
+                        min={1} max={20} step={1}
+                        value={[(hp as { maxDepth: number }).maxDepth]}
+                        onValueChange={([v]) => updateHyperparam('decision_tree', 'maxDepth', v)}
+                      />
+                    </div>
                   </div>
-                  <Slider
-                    min={1} max={20} step={1}
-                    value={[(hp as { maxDepth: number }).maxDepth]}
-                    onValueChange={([v]) => updateHyperparam('decision_tree', 'maxDepth', v)}
-                  />
+                  <div className="flex justify-center items-center pt-4">
+                    <DecisionTreeVisualisation maxDepth={(hp as { maxDepth: number }).maxDepth} />
+                  </div>
                 </div>
               )}
 
               {selectedModel === 'random_forest' && (
-                <>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <ParamLabel label="Number of Trees" tooltip="How many individual decision trees to generate before combining their output for a more robust ensemble vote." />
-                      <span className="font-semibold">{(hp as { nTrees: number }).nTrees}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <ParamLabel label={t('steps.4.hp.rf.nTrees')} tooltip={t('steps.4.hp.rf.nTrees_tip')} />
+                        <span className="font-semibold">{(hp as { nTrees: number }).nTrees}</span>
+                      </div>
+                      <Slider
+                        min={10} max={200} step={10}
+                        value={[(hp as { nTrees: number }).nTrees]}
+                        onValueChange={([v]) => updateHyperparam('random_forest', 'nTrees', v)}
+                      />
                     </div>
-                    <Slider
-                      min={10} max={200} step={10}
-                      value={[(hp as { nTrees: number }).nTrees]}
-                      onValueChange={([v]) => updateHyperparam('random_forest', 'nTrees', v)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <ParamLabel label="Max Depth" tooltip="The maximum depth allowed for each individual tree in the random forest ensemble." />
-                      <span className="font-semibold">{(hp as { maxDepth: number }).maxDepth}</span>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <ParamLabel label={t('steps.4.hp.rf.maxDepth')} tooltip={t('steps.4.hp.rf.maxDepth_tip')} />
+                        <span className="font-semibold">{(hp as { maxDepth: number }).maxDepth}</span>
+                      </div>
+                      <Slider
+                        min={1} max={20} step={1}
+                        value={[(hp as { maxDepth: number }).maxDepth]}
+                        onValueChange={([v]) => updateHyperparam('random_forest', 'maxDepth', v)}
+                      />
                     </div>
-                    <Slider
-                      min={1} max={20} step={1}
-                      value={[(hp as { maxDepth: number }).maxDepth]}
-                      onValueChange={([v]) => updateHyperparam('random_forest', 'maxDepth', v)}
-                    />
                   </div>
-                </>
+                  <div className="flex justify-center items-center pt-4">
+                    <RandomForestVisualisation nTrees={(hp as { nTrees: number }).nTrees} maxDepth={(hp as { maxDepth: number }).maxDepth} />
+                  </div>
+                </div>
               )}
 
               {selectedModel === 'logistic_regression' && (
-                <>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <ParamLabel label="Regularisation (C)" tooltip="Inverse of regularisation strength. Smaller values specify stronger regularisation, creating a simpler model." />
-                      <span className="font-semibold">{(hp as { C: number }).C}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <ParamLabel label={t('steps.4.hp.lr.c')} tooltip={t('steps.4.hp.lr.c_tip')} />
+                        <span className="font-semibold">{(hp as { C: number }).C}</span>
+                      </div>
+                      <Slider
+                        min={1} max={100} step={1}
+                        value={[(hp as { C: number }).C]}
+                        onValueChange={([v]) => updateHyperparam('logistic_regression', 'C', v)}
+                      />
                     </div>
-                    <Slider
-                      min={1} max={100} step={1}
-                      value={[(hp as { C: number }).C]}
-                      onValueChange={([v]) => updateHyperparam('logistic_regression', 'C', v)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <ParamLabel label="Max Iterations" tooltip="The maximum number of times the algorithm tries to adjust its weights before concluding the optimization." />
-                      <span className="font-semibold">{(hp as { maxIter: number }).maxIter}</span>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <ParamLabel label={t('steps.4.hp.lr.maxIter')} tooltip={t('steps.4.hp.lr.maxIter_tip')} />
+                        <span className="font-semibold">{(hp as { maxIter: number }).maxIter}</span>
+                      </div>
+                      <Slider
+                        min={50} max={500} step={50}
+                        value={[(hp as { maxIter: number }).maxIter]}
+                        onValueChange={([v]) =>
+                          updateHyperparam('logistic_regression', 'maxIter', v)
+                        }
+                      />
                     </div>
-                    <Slider
-                      min={50} max={500} step={50}
-                      value={[(hp as { maxIter: number }).maxIter]}
-                      onValueChange={([v]) =>
-                        updateHyperparam('logistic_regression', 'maxIter', v)
-                      }
-                    />
                   </div>
-                </>
+                  <div className="flex justify-center items-center pt-4">
+                    <LogisticRegressionVisualisation C={(hp as { C: number }).C} maxIter={(hp as { maxIter: number }).maxIter} />
+                  </div>
+                </div>
               )}
 
               {selectedModel === 'naive_bayes' && (
-                <p className="text-sm text-muted-foreground">
-                  Naïve Bayes uses a variance smoothing parameter (var_smoothing = 1e-9 by
-                  default). No further tuning is typically needed.
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4 flex flex-col justify-center h-full">
+                    <p className="text-sm text-muted-foreground">
+                      {t('steps.4.hp.nb.desc')}
+                    </p>
+                  </div>
+                  <div className="flex justify-center items-center pt-4">
+                    <NaiveBayesVisualisation />
+                  </div>
+                </div>
               )}
 
               {trainingError && (
-                <Banner variant="error" title="Training Error" message={trainingError} />
+                <Banner variant="error" title={t('steps.4.trainingError')} message={trainingError} />
               )}
 
               <div className="flex gap-3 pt-2">
@@ -366,12 +402,12 @@ export function Step4ModelTraining() {
                   disabled={isTraining}
                 >
                   <Play className="h-4 w-4" />
-                  {isTraining ? 'Training...' : 'Train Model'}
+                  {isTraining ? t('steps.4.training') : t('steps.4.trainModel')}
                 </Button>
                 {currentResult && (
                   <Button variant="outline" onClick={handleAddToComparison}>
                     <Plus className="h-4 w-4" />
-                    Compare
+                    {t('steps.4.compare')}
                   </Button>
                 )}
               </div>
@@ -384,15 +420,15 @@ export function Step4ModelTraining() {
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-clinical-success" />
-                  Training Complete
+                  {t('steps.4.trainingComplete')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   {[
-                    { label: 'Accuracy', value: currentResult.metrics.accuracy },
-                    { label: 'Sensitivity', value: currentResult.metrics.sensitivity },
-                    { label: 'AUC', value: currentResult.metrics.auc },
+                    { label: t('steps.4.accuracy'), value: currentResult.metrics.accuracy },
+                    { label: t('steps.4.sensitivity'), value: currentResult.metrics.sensitivity },
+                    { label: t('steps.4.auc'), value: currentResult.metrics.auc },
                   ].map(({ label, value }) => (
                     <div key={label} className="text-center rounded-lg bg-surface p-3">
                       <p className="text-2xl font-bold text-brand-navy">
@@ -407,7 +443,7 @@ export function Step4ModelTraining() {
                   className="w-full"
                   onClick={() => setCurrentStep(5)}
                 >
-                  View Full Results
+                  {t('steps.4.viewFullResults')}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </CardContent>
@@ -418,14 +454,14 @@ export function Step4ModelTraining() {
           {comparisonRows.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Model Comparison</CardTitle>
+                <CardTitle className="text-base">{t('steps.4.modelComparison')}</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border-subtle">
-                        {['Model', 'Accuracy', 'Sensitivity', 'Specificity', 'AUC'].map((h) => (
+                        {[t('steps.4.model'), t('steps.4.accuracy'), t('steps.4.sensitivity'), t('steps.4.specificity'), t('steps.4.auc')].map((h) => (
                           <th
                             key={h}
                             className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider"
