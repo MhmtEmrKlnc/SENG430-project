@@ -1,0 +1,181 @@
+'use client'
+
+import * as React from 'react'
+import { ChevronLeft, ChevronRight, Lock } from 'lucide-react'
+import { useAppStore } from '@/lib/store'
+import { Navbar } from './Navbar'
+import { Stepper } from './Stepper'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n'
+
+// Lazy-load step components to keep initial bundle small
+const StepComponents = {
+  1: React.lazy(() => import('@/components/steps/Step1ClinicalContext').then(m => ({ default: m.Step1ClinicalContext }))),
+  2: React.lazy(() => import('@/components/steps/Step2DataExploration').then(m => ({ default: m.Step2DataExploration }))),
+  3: React.lazy(() => import('@/components/steps/Step3DataPrep').then(m => ({ default: m.Step3DataPrep }))),
+  4: React.lazy(() => import('@/components/steps/Step4ModelTraining').then(m => ({ default: m.Step4ModelTraining }))),
+  5: React.lazy(() => import('@/components/steps/Step5Results').then(m => ({ default: m.Step5Results }))),
+  6: React.lazy(() => import('@/components/steps/Step6Explainability').then(m => ({ default: m.Step6Explainability }))),
+  7: React.lazy(() => import('@/components/steps/Step7Ethics').then(m => ({ default: m.Step7Ethics }))),
+} as const
+
+type StepNumber = keyof typeof StepComponents
+
+
+
+function StepLoadingFallback() {
+  const { t } = useTranslation()
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex flex-col items-center gap-3 text-muted-foreground">
+        <svg
+          className="animate-spin h-8 w-8 text-brand-teal"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <span className="text-sm">{t('common.loadingStep')}</span>
+      </div>
+    </div>
+  )
+}
+
+function LockedStepPlaceholder({ stepNumber }: { stepNumber: number }) {
+  const { t } = useTranslation()
+  const stepLabel = t(`steps.${stepNumber as StepNumber}.label`) ?? `Step ${stepNumber}`
+
+  const lockMessage = t(`lockedMessages.${stepNumber}`) ?? t('common.completePrevious')
+
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="text-center max-w-sm px-6">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface border-2 border-border-subtle">
+          <Lock className="h-7 w-7 text-muted-foreground" />
+        </div>
+        <h2 className="text-xl font-semibold text-brand-navy mb-2">
+          {stepLabel} {t('common.locked')}
+        </h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {lockMessage}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export function AppShell() {
+  const { t } = useTranslation()
+  const { currentStep, unlockedSteps, setCurrentStep } = useAppStore()
+  const unlockedSet = new Set(unlockedSteps)
+  // a11y: move focus to step heading on every step transition
+  const stepHeadingRef = React.useRef<HTMLHeadingElement>(null)
+  React.useEffect(() => {
+    stepHeadingRef.current?.focus()
+  }, [currentStep])
+
+  const isUnlocked = (step: number) => unlockedSet.has(step)
+
+  function handlePrev() {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  function handleNext() {
+    const nextStep = currentStep + 1
+    if (nextStep <= 7 && isUnlocked(nextStep)) {
+      setCurrentStep(nextStep)
+    }
+  }
+
+  const canGoPrev = currentStep > 1
+  const canGoNext = currentStep < 7 && isUnlocked(currentStep + 1)
+
+  const ActiveStep = StepComponents[currentStep as StepNumber]
+
+  return (
+    <div className="min-h-screen bg-surface flex flex-col">
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Stepper */}
+      <Stepper />
+
+      {/* Main content area */}
+      <main className="flex-1" id="main-content">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 pb-24">
+          <React.Suspense fallback={<StepLoadingFallback />}>
+            {isUnlocked(currentStep) ? (
+              <div
+                key={currentStep}
+                className="animate-fade-in"
+              >
+                {/* a11y: sr-only heading receives focus on step change so screen readers announce the new step */}
+                <h2
+                  ref={stepHeadingRef}
+                  tabIndex={-1}
+                  className="sr-only focus:not-sr-only"
+                  aria-live="polite"
+                >
+                  {t(`steps.${currentStep as StepNumber}.label`)}
+                </h2>
+                <ActiveStep />
+              </div>
+            ) : (
+              <LockedStepPlaceholder stepNumber={currentStep} />
+            )}
+          </React.Suspense>
+        </div>
+      </main>
+
+      {/* Bottom navigation bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border-subtle bg-surface-card/95 backdrop-blur supports-[backdrop-filter]:bg-surface-card/80">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between gap-4">
+            {/* Previous */}
+            <Button
+              variant="outline"
+              onClick={handlePrev}
+              disabled={!canGoPrev}
+              className={cn(!canGoPrev && 'invisible')}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>{t('common.previous')}</span>
+            </Button>
+
+            {/* Step indicator */}
+            <div className="text-center">
+              <span className="text-xs text-muted-foreground">
+                {t('common.step')} {currentStep} {t('common.of')} 7
+              </span>
+              <p className="text-sm font-medium text-brand-navy hidden sm:block">
+                {t(`steps.${currentStep as StepNumber}.label`)}
+              </p>
+            </div>
+
+            {/* Next */}
+            {currentStep < 7 ? (
+              <Button
+                variant={canGoNext ? 'teal' : 'outline'}
+                onClick={handleNext}
+                disabled={!canGoNext}
+                className={cn(!canGoNext && 'opacity-50')}
+                title={!canGoNext ? t('common.completePrevious') : undefined}
+              >
+                <span>{t('common.next')}</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            ) : (
+              <div className="w-[88px]" />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
